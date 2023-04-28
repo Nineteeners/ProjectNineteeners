@@ -50,6 +50,35 @@ async function applyGreenTint(imageUrl) {
     .toBuffer();
   return tintedImageBuffer;
 }
+
+// Function to modify movie titles and posters
+async function modifyMovies(element) {
+  const { original_title, poster_path } = element;
+
+  // Modify original title
+  const modifiedTitle = modifyTitle(original_title, [
+    "Green",
+    "Sage",
+    "Emerald",
+  ]);
+
+  // Download poster image and apply green tint
+  const tintedImageBuffer = await applyGreenTint(poster_path);
+
+  // Convert image buffer to base64-encoded data URL
+  const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
+  const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+
+  // Create new response object that includes all of the movie data
+  const modifiedResponse = {
+    ...element,
+    title: modifiedTitle,
+    poster: dataUrl,
+  };
+
+  return modifiedResponse;
+}
+
 //Homepage
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
@@ -60,7 +89,7 @@ app.get("/movie/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    //Fetch movie data from API
+    // Fetch movie data from API
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${id}`,
       {
@@ -70,31 +99,13 @@ app.get("/movie/:id", async (req, res) => {
         },
       }
     );
-    const { original_title, poster_path } = response.data;
+    const movie = response.data;
 
-    //Modify original title
-    const modifiedTitle = modifyTitle(original_title, [
-      "Green",
-      "Sage",
-      "Emerald",
-    ]);
+    // Modify the movie using modifyMovies function
+    const modifiedMovie = await modifyMovies(movie);
 
-    //Download poster image and apply green tint
-    const tintedImageBuffer = await applyGreenTint(poster_path);
-
-    //Convert image buffer to base64-encoded data URL
-    const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
-    const dataUrl = `data:image/jpeg;base64,${base64Image}`;
-
-    //Create new response object that includes all of the movie data
-    const modifiedResponse = {
-      ...response.data,
-      title: modifiedTitle,
-      poster: dataUrl,
-    };
-
-    //Send modified response as JSON
-    res.json(modifiedResponse);
+    // Send modified response as JSON
+    res.json(modifiedMovie);
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");
@@ -137,35 +148,8 @@ app.get("/search/:query/:page", async (req, res) => {
     // Limit the number of results by slicing the array
     const movies = allMovies.slice(startIndex, endIndex);
 
-    // Modify each movie in the array (title and poster)
-    const modifiedMovies = await Promise.all(
-      movies.map(async (element) => {
-        const { original_title, poster_path } = element;
-
-        // Modify original title
-        const modifiedTitle = modifyTitle(original_title, [
-          "Green",
-          "Sage",
-          "Emerald",
-        ]);
-
-        // Download poster image and apply green tint
-        const tintedImageBuffer = await applyGreenTint(poster_path);
-
-        // Convert image buffer to base64-encoded data URL
-        const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
-        const dataUrl = `data:image/jpeg;base64,${base64Image}`;
-
-        // Create new response object that includes all of the movie data
-        const modifiedResponse = {
-          ...element,
-          title: modifiedTitle,
-          poster: dataUrl,
-        };
-
-        return modifiedResponse;
-      })
-    );
+    // Modify each movie in the array using the modifyMovies function
+    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
 
     // Send the modified response objects and total pages back to the client
     res.send({
@@ -180,9 +164,10 @@ app.get("/search/:query/:page", async (req, res) => {
 
 //API endpoint to fet popular movies
 
+// Modify the popular movies endpoint
 app.get("/popular", async (req, res) => {
   try {
-    //Fetch movie data from API
+    // Fetch movie data from API
     const response = await axios.get(
       "https://api.themoviedb.org/3/movie/popular",
       {
@@ -194,8 +179,37 @@ app.get("/popular", async (req, res) => {
     );
     const movies = response.data.results;
 
-    //Send movies as response
-    res.json(movies);
+    // Modify each movie in the array (title and poster)
+    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
+
+    // Send modified movies as response
+    res.json(modifiedMovies);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+// Modify the top rated movies endpoint
+app.get("/top_rated", async (req, res) => {
+  try {
+    // Fetch top rated movie data from API
+    const response = await axios.get(
+      "https://api.themoviedb.org/3/movie/top_rated",
+      {
+        params: {
+          api_key: apiKey,
+          language,
+        },
+      }
+    );
+    const movies = response.data.results;
+
+    // Modify each movie in the array (title and poster)
+    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
+
+    // Send modified movies as response
+    res.json(modifiedMovies);
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");

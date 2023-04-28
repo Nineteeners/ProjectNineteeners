@@ -89,13 +89,15 @@
       });
 
       function createMovieCard(movie) {
-        console.log(movie);
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
 
         const moviePoster = document.createElement("img");
         moviePoster.classList.add("movie-poster");
         moviePoster.src = movie.poster;
+        moviePoster.onerror = function () {
+          movieCard.remove();
+        };
         movieCard.appendChild(moviePoster);
 
         const movieTitle = document.createElement("div");
@@ -113,19 +115,28 @@
 
       // Update the searchMovies function to take a page parameter
       async function searchMovies(query, page = 1) {
-  try {
-    const response = await axios.get(`/search/${query}/${page}`);
-          const movies = response.data.results;
-          const totalPages = response.data.total_pages;
+        try {
+          const response = await axios.get(`/search/${query}/${page}`);
+          console.log(response.data.results);
+          let movies = response.data.results || []; // check if results exist
+          const totalPages = response.data.total_pages; // handle total pages count
+
           previousButton.disabled = page <= 1;
           nextButton.disabled = page >= totalPages;
 
           const moviesContainer = document.querySelector(".movies-container");
           moviesContainer.innerHTML = "";
-          movies.forEach((movie) => {
-            const movieCard = createMovieCard(movie);
-            moviesContainer.appendChild(movieCard);
-          });
+          if (movies.length === 0) {
+            // check length of movies array
+            moviesContainer.innerHTML = "<p>No results found.</p>";
+          } else {
+            movies.forEach((movie) => {
+              const movieCard = createMovieCard(movie);
+              if (movieCard) {
+                moviesContainer.appendChild(movieCard);
+              }
+            });
+          }
         } catch (error) {
           console.error(error);
         }

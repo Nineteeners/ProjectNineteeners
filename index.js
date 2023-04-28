@@ -41,8 +41,8 @@ function pickGreenTint() {
 
 //Download poster image and apply green tint
 async function applyGreenTint(imageUrl) {
-  const imageBuffer = await axios.get(
-    "https://image.tmdb.org/t/p/original/" + imageUrl,
+    const imageBuffer = await axios.get(
+        "https://image.tmdb.org/t/p/w500/" + imageUrl,
     { responseType: "arraybuffer" }
   );
   const tintedImageBuffer = await sharp(imageBuffer.data)
@@ -102,40 +102,58 @@ app.get("/movie/:id", async (req, res) => {
 });
 
 //API endpoint to search for movies
-app.get("/search/:query", async (req, res) => {
-  const { query } = req.params;
+// API endpoint to search for movies with pagination
+app.get("/search/:query/:page", async (req, res) => {
+    const { query } = req.params;
+    const { page } = req.params;
+  
+    // Set the number of results per page
+    const perPage = 9;
+  
+    try {
+      // Fetch movie data from API with pagination
+      const response = await axios.get(
+        "https://api.themoviedb.org/3/search/movie",
+        {
+          params: {
+            api_key: apiKey,
+            language,
+            query,
+            page,
+          },
+        }
+      );
 
-  try {
-    //Fetch movie data from API
-    const response = await axios.get(
-      "https://api.themoviedb.org/3/search/movie",
-      {
-        params: {
-          api_key: apiKey,
-          language,
-          query,
-        },
-      }
-    );
-    const movies = response.data.results;
+    // Extract the movies from the API response
+    const allMovies = response.data.results;
+
+    // Calculate the start and end index for slicing the results
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
+
+    // Limit the number of results by slicing the array
+    const movies = allMovies.slice(startIndex, endIndex);
+
+    // Modify each movie in the array (title and poster)
     const modifiedMovies = await Promise.all(
       movies.map(async (element) => {
         const { original_title, poster_path } = element;
-        //Modify original title
+
+        // Modify original title
         const modifiedTitle = modifyTitle(original_title, [
           "Green",
           "Sage",
           "Emerald",
         ]);
 
-        //Download poster image and apply green tint
+        // Download poster image and apply green tint
         const tintedImageBuffer = await applyGreenTint(poster_path);
 
-        //Convert image buffer to base64-encoded data URL
+        // Convert image buffer to base64-encoded data URL
         const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
         const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
-        //Create new response object that includes all of the movie data
+        // Create new response object that includes all of the movie data
         const modifiedResponse = {
           ...element,
           title: modifiedTitle,
@@ -146,32 +164,16 @@ app.get("/search/:query", async (req, res) => {
       })
     );
 
-    //Send modified movies as response
-    res.json(modifiedMovies);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal server error");
-  }
-});
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(response.data.total_results / perPage);
 
-//API endpoint to fetch top rated movies
-
-app.get("/top-rated", async (req, res) => {
-  try {
-    //Fetch movie data from API
-    const response = await axios.get(
-      "https://api.themoviedb.org/3/movie/top_rated",
-      {
-        params: {
-          api_key: apiKey,
-          language,
-        },
-      }
-    );
-    const movies = response.data.results;
-
-    //Send movies as response
-    res.json(movies);
+    // Send modified movies as response with pagination information
+    res.json({
+      page: parseInt(page, 10),
+      total_pages: totalPages,
+      total_results: response.data.total_results,
+      results: modifiedMovies,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");

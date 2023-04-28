@@ -5,55 +5,55 @@
     <meta charset="utf-8" />
     <title>Movie Search App</title>
     <style>
-        /* Basic CSS for the page layout */
-        body {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          font-family: Arial, sans-serif;
-        }
-  
-        h1 {
-          margin-bottom: 20px;
-        }
-  
-        .search-container {
-          margin-bottom: 20px;
-        }
-  
-        .movies-container {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-  
-        .movie-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin: 10px;
-          width: 200px;
-          cursor: pointer;
-          transition: box-shadow 0.2s ease-in-out;
-        }
-  
-        .movie-card:hover {
-          box-shadow: 0px 0px 10px 3px rgba(0, 255, 0, 0.5);
-        }
-  
-        .movie-poster {
-          width: 150px;
-          height: 225px;
-          object-fit: cover;
-          margin-bottom: 10px;
-        }
-  
-        .movie-title {
-          text-align: center;
-          font-weight: bold;
-        }
-      </style>
+      /* Basic CSS for the page layout */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+
+      .search-container {
+        margin-bottom: 20px;
+      }
+
+      .movies-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .movie-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px;
+        width: 200px;
+        cursor: pointer;
+        transition: box-shadow 0.2s ease-in-out;
+      }
+
+      .movie-card:hover {
+        box-shadow: 0px 0px 10px 3px rgba(0, 255, 0, 0.5);
+      }
+
+      .movie-poster {
+        width: 150px;
+        height: 225px;
+        object-fit: cover;
+        margin-bottom: 10px;
+      }
+
+      .movie-title {
+        text-align: center;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
     <h1>Movie Search App</h1>
@@ -64,14 +64,32 @@
     </div>
     <div class="movies-container"></div>
 
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script>
-      const searchInput = document.getElementById("search-input");
-      const searchButton = document.getElementById("search-button");
-      const moviesContainer = document.querySelector(".movies-container");
+    <!-- Add previous and next buttons to the HTML -->
+    <button id="previous-button" disabled>Previous</button>
+    <button id="next-button" disabled>Next</button>
 
-      // Function to create the movie card HTML for each movie
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+      // Add event listeners for the previous and next buttons
+      const previousButton = document.getElementById("previous-button");
+      const nextButton = document.getElementById("next-button");
+      const searchButton = document.getElementById("search-button");
+      const searchInput = document.getElementById("search-input");
+      let currentPage = 1;
+
+      previousButton.addEventListener("click", () => {
+        currentPage--;
+        searchMovies(searchInput.value.trim(), currentPage);
+      });
+
+      nextButton.addEventListener("click", () => {
+        currentPage++;
+        searchMovies(searchInput.value.trim(), currentPage);
+      });
+
       function createMovieCard(movie) {
+        console.log(movie);
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
 
@@ -93,12 +111,16 @@
         return movieCard;
       }
 
-      // Function to fetch movies from the API and display them on the page
-      async function searchMovies(query) {
-        try {
-          const response = await axios.get(`/search/${query}`);
-          const movies = response.data;
+      // Update the searchMovies function to take a page parameter
+      async function searchMovies(query, page = 1) {
+  try {
+    const response = await axios.get(`/search/${query}/${page}`);
+          const movies = response.data.results;
+          const totalPages = response.data.total_pages;
+          previousButton.disabled = page <= 1;
+          nextButton.disabled = page >= totalPages;
 
+          const moviesContainer = document.querySelector(".movies-container");
           moviesContainer.innerHTML = "";
           movies.forEach((movie) => {
             const movieCard = createMovieCard(movie);
@@ -109,12 +131,14 @@
         }
       }
 
-      // Event listener for the search button
+      // Update the event listener for the search button
+      const moviesContainer = document.querySelector(".movies-container");
       searchButton.addEventListener("click", () => {
         const query = searchInput.value.trim();
 
         if (query.length > 0) {
-          searchMovies(query);
+          currentPage = 1;
+          searchMovies(query, currentPage);
         }
       });
     </script>

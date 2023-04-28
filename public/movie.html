@@ -4,11 +4,23 @@
   <head>
     <meta charset="UTF-8" />
     <title>Movie Poster Tinter</title>
+    <style>
+      /* Set fixed size for poster image */
+      #poster {
+        width: 300px;
+        height: 450px;
+      }
+    </style>
   </head>
   <body>
     <div id="container" style="display: none">
       <h1 id="title"></h1>
       <img id="poster" src="" alt="Poster" />
+      <h2 id="overview">Overview</h2>
+      <p id="vote_average"></p>
+      <p id="vote_count"></p>
+      <p id="budget"></p>
+      <ul id="genres"></ul>
     </div>
 
     <script>
@@ -30,6 +42,25 @@
 
           const poster = document.getElementById("poster");
           poster.src = data.poster;
+
+          const overview = document.getElementById("overview");
+          overview.innerHTML = data.overview;
+
+          const voteAverage = document.getElementById("vote_average");
+          voteAverage.innerHTML = `Average rating: ${data.vote_average}`;
+
+          const voteCount = document.getElementById("vote_count");
+          voteCount.innerHTML = `Number of votes: ${data.vote_count}`;
+
+          const budget = document.getElementById("budget");
+          budget.innerHTML = `Budget: ${data.budget}`;
+
+          const genres = document.getElementById("genres");
+          data.genres.forEach((genre) => {
+            const li = document.createElement("li");
+            li.innerHTML = genre.name;
+            genres.appendChild(li);
+          });
         })
         .catch((error) => console.log(error));
     </script>

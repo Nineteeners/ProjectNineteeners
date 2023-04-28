@@ -86,11 +86,15 @@ app.get("/movie/:id", async (req, res) => {
     const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
     const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
-    //Send modified movie title and green-tinted poster image as response
-    res.json({
+    //Create new response object that includes all of the movie data
+    const modifiedResponse = {
+      ...response.data,
       title: modifiedTitle,
       poster: dataUrl,
-    });
+    };
+
+    //Send modified response as JSON
+    res.json(modifiedResponse);
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");

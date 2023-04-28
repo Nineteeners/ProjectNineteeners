@@ -41,8 +41,8 @@ function pickGreenTint() {
 
 //Download poster image and apply green tint
 async function applyGreenTint(imageUrl) {
-    const imageBuffer = await axios.get(
-        "https://image.tmdb.org/t/p/w500/" + imageUrl,
+  const imageBuffer = await axios.get(
+    "https://image.tmdb.org/t/p/w500/" + imageUrl,
     { responseType: "arraybuffer" }
   );
   const tintedImageBuffer = await sharp(imageBuffer.data)
@@ -101,31 +101,34 @@ app.get("/movie/:id", async (req, res) => {
   }
 });
 
-//API endpoint to search for movies
 // API endpoint to search for movies with pagination
 app.get("/search/:query/:page", async (req, res) => {
-    const { query } = req.params;
-    const { page } = req.params;
-  
-    // Set the number of results per page
-    const perPage = 9;
-  
-    try {
-      // Fetch movie data from API with pagination
-      const response = await axios.get(
-        "https://api.themoviedb.org/3/search/movie",
-        {
-          params: {
-            api_key: apiKey,
-            language,
-            query,
-            page,
-          },
-        }
-      );
+  const { query, page } = req.params;
 
-    // Extract the movies from the API response
-    const allMovies = response.data.results;
+  // Set the number of results per page
+  const perPage = 9;
+
+  try {
+    // Fetch movie data from API with pagination
+    const response = await axios.get(
+      "https://api.themoviedb.org/3/search/movie",
+      {
+        params: {
+          api_key: apiKey,
+          language,
+          query,
+          page,
+        },
+      }
+    );
+
+    // Extract the movies from the API response and filter out movies with NULL posters
+    const allMovies = response.data.results.filter(
+      (movie) => movie.poster_path !== null
+    );
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(allMovies.length / perPage);
 
     // Calculate the start and end index for slicing the results
     const startIndex = (page - 1) * perPage;
@@ -164,19 +167,14 @@ app.get("/search/:query/:page", async (req, res) => {
       })
     );
 
-    // Calculate the total number of pages
-    const totalPages = Math.ceil(response.data.total_results / perPage);
-
-    // Send modified movies as response with pagination information
-    res.json({
-      page: parseInt(page, 10),
-      total_pages: totalPages,
-      total_results: response.data.total_results,
+    // Send the modified response objects and total pages back to the client
+    res.send({
       results: modifiedMovies,
+      total_pages: totalPages,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal server error");
+    console.error(error);
+    res.status(500).send("Server error.");
   }
 });
 

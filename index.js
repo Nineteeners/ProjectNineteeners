@@ -118,9 +118,36 @@ app.get("/search/:query", async (req, res) => {
       }
     );
     const movies = response.data.results;
+    const modifiedMovies = await Promise.all(
+      movies.map(async (element) => {
+        const { original_title, poster_path } = element;
+        //Modify original title
+        const modifiedTitle = modifyTitle(original_title, [
+          "Green",
+          "Sage",
+          "Emerald",
+        ]);
 
-    //Send movies as response
-    res.json(movies);
+        //Download poster image and apply green tint
+        const tintedImageBuffer = await applyGreenTint(poster_path);
+
+        //Convert image buffer to base64-encoded data URL
+        const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
+        const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+
+        //Create new response object that includes all of the movie data
+        const modifiedResponse = {
+          ...element,
+          title: modifiedTitle,
+          poster: dataUrl,
+        };
+
+        return modifiedResponse;
+      })
+    );
+
+    //Send modified movies as response
+    res.json(modifiedMovies);
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");

@@ -4,72 +4,86 @@ const sharp = require("sharp");
 
 const app = express();
 app.use(express.static("./public"));
+const bodyParser = require("body-parser");
 
-//API call description
+app.use(bodyParser.json());
+
+let themeColor = "green";
 const apiEndpoint = "https://api.themoviedb.org/3/movie/{movieId}";
 const apiKey = "7cc158372c00b8d6218089b844305d59";
 const language = "en-US";
 
-//Replace one of the words in the title with a synonym for green
-function modifyTitle(title, synonym) {
-  //Picking which synonym to use
-  const picked_synonym = synonym[Math.floor(Math.random() * synonym.length)];
+const colorSynonyms = {
+  red: ["Crimson", "Scarlet", "Burgundy", "Cherry", "Ruby", "Rose", "Maroon"],
+  blue: ["Navy", "Azure", "Cobalt", "Indigo", "Sapphire", "Sky", "Cerulean"],
+  green: ["Emerald", "Olive", "Lime", "Forest", "Sage", "Chartreuse", "Kelly"],
+  yellow: ["Gold", "Lemon", "Canary", "Amber", "Mustard", "Butter", "Blonde"],
+  purple: ["Lavender", "Violet", "Mauve", "Plum", "Grape", "Lilac", "Amethyst"],
+};
+
+function modifyTitle(title, color) {
+  const synonyms = colorSynonyms[color];
+  const pickedSynonym = synonyms[Math.floor(Math.random() * synonyms.length)];
   const words = title.split(" ");
-  //If only 1 word, append synonym to beggining or the end
+
   if (words.length < 2) {
     if (Math.random() < 0.5) {
-      words.unshift(picked_synonym);
+      words.unshift(pickedSynonym);
     } else {
-      words.push(picked_synonym);
+      words.push(pickedSynonym);
     }
     return words.join(" ");
   } else {
     const randomIndex = Math.floor(Math.random() * words.length);
-    words[randomIndex] = picked_synonym;
+    words[randomIndex] = pickedSynonym;
     return words.join(" ");
   }
 }
-//Pick a random tint of green shade anything from #004400 to #00ff00
-function pickGreenTint() {
-  const minGreen = parseInt("30", 16); // Convert hex to decimal
-  const maxGreen = parseInt("FF", 16); // Convert hex to decimal
-  const randomGreen =
-    Math.floor(Math.random() * (maxGreen - minGreen + 1)) + minGreen; // Generate random number in range
-  const randomGreenHex = randomGreen.toString(16); // Convert decimal to hex
-  return "#00" + randomGreenHex + "00"; // Return green tint with #00 prefix;
+
+function pickColorTint(color) {
+  const min = parseInt("30", 16);
+  const max = parseInt("FF", 16);
+  const randomValue = Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomHex = randomValue.toString(16);
+
+  switch (color) {
+    case "red":
+      return "#" + randomHex + "0000";
+    case "blue":
+      return "#0000" + randomHex;
+    case "green":
+      return "#00" + randomHex + "00";
+    case "yellow":
+      return "#" + randomHex + randomHex + "00";
+    case "purple":
+      return "#" + randomHex + "00" + randomHex;
+    default:
+      return "#000000";
+  }
 }
 
-//Download poster image and apply green tint
-async function applyGreenTint(imageUrl) {
+async function applyColorTint(imageUrl, color) {
   const imageBuffer = await axios.get(
     "https://image.tmdb.org/t/p/w500/" + imageUrl,
-    { responseType: "arraybuffer" }
+    {
+      responseType: "arraybuffer",
+    }
   );
   const tintedImageBuffer = await sharp(imageBuffer.data)
-    .tint(pickGreenTint())
+    .tint(pickColorTint(color))
     .toBuffer();
   return tintedImageBuffer;
 }
 
-// Function to modify movie titles and posters
-async function modifyMovies(element) {
+async function modifyMovies(element, color) {
   const { original_title, poster_path } = element;
 
-  // Modify original title
-  const modifiedTitle = modifyTitle(original_title, [
-    "Green",
-    "Sage",
-    "Emerald",
-  ]);
+  const modifiedTitle = modifyTitle(original_title, color);
+  const tintedImageBuffer = await applyColorTint(poster_path, color);
 
-  // Download poster image and apply green tint
-  const tintedImageBuffer = await applyGreenTint(poster_path);
-
-  // Convert image buffer to base64-encoded data URL
   const base64Image = Buffer.from(tintedImageBuffer).toString("base64");
   const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
-  // Create new response object that includes all of the movie data
   const modifiedResponse = {
     ...element,
     title: modifiedTitle,
@@ -78,6 +92,15 @@ async function modifyMovies(element) {
 
   return modifiedResponse;
 }
+
+app.post("/theme", (req, res) => {
+  themeColor = req.body.color;
+  res.send({ color: themeColor });
+});
+
+app.get("/theme", (req, res) => {
+  res.send({ color: themeColor });
+});
 
 //Homepage
 app.get("/", (req, res) => {
@@ -102,7 +125,7 @@ app.get("/movie/:id", async (req, res) => {
     const movie = response.data;
 
     // Modify the movie using modifyMovies function
-    const modifiedMovie = await modifyMovies(movie);
+    const modifiedMovie = await modifyMovies(movie, themeColor);
 
     // Send modified response as JSON
     res.json(modifiedMovie);
@@ -149,7 +172,9 @@ app.get("/search/:query/:page", async (req, res) => {
     const movies = allMovies.slice(startIndex, endIndex);
 
     // Modify each movie in the array using the modifyMovies function
-    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
+    const modifiedMovies = await Promise.all(
+      movies.map((movie) => modifyMovies(movie, themeColor))
+    );
 
     // Send the modified response objects and total pages back to the client
     res.send({
@@ -180,7 +205,9 @@ app.get("/popular", async (req, res) => {
     const movies = response.data.results;
 
     // Modify each movie in the array (title and poster)
-    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
+    const modifiedMovies = await Promise.all(
+      movies.map((movie) => modifyMovies(movie, themeColor))
+    );
 
     // Send modified movies as response
     res.json(modifiedMovies);
@@ -206,7 +233,9 @@ app.get("/top_rated", async (req, res) => {
     const movies = response.data.results;
 
     // Modify each movie in the array (title and poster)
-    const modifiedMovies = await Promise.all(movies.map(modifyMovies));
+    const modifiedMovies = await Promise.all(
+      movies.map((movie) => modifyMovies(movie, themeColor))
+    );
 
     // Send modified movies as response
     res.json(modifiedMovies);

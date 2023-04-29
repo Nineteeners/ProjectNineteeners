@@ -19,9 +19,10 @@
         align-items: center;
         flex-direction: column;
         font-family: Arial, sans-serif;
+        transition: background-color 0.3s ease;
       }
       .bg-red {
-        background-color: rgb(72, 29, 29);
+        background-color: rgb(223, 27, 27);
       }
 
       .bg-green {
@@ -61,11 +62,16 @@
         margin: 10px;
         width: 200px;
         cursor: pointer;
-        transition: box-shadow 0.2s ease-in-out;
+        opacity: 0;
+        transition: opacity 0.3s ease, box-shadow 0.2s ease-in-out;
+      }
+
+      .movie-card.show {
+        opacity: 1;
       }
 
       .movie-card:hover {
-        box-shadow: 0px 0px 10px 3px rgba(0, 255, 0, 0.5);
+        box-shadow: 0px 0px 10px 3px rgb(0, 0, 0);
       }
 
       .movie-poster {
@@ -223,10 +229,13 @@
             // check length of movies array
             moviesContainer.innerHTML = "<p>No results found.</p>";
           } else {
-            movies.forEach((movie) => {
+            movies.forEach((movie, index) => {
               const movieCard = createMovieCard(movie);
               if (movieCard) {
                 moviesContainer.appendChild(movieCard);
+                setTimeout(() => {
+                  movieCard.classList.add("show");
+                }, 50 * index);
               }
             });
           }
@@ -251,14 +260,6 @@
               "bg-purple"
             );
             body.classList.add(`bg-${color}`);
-
-            // Update the movie card highlighting
-            const movieCards = document.querySelectorAll(".movie-card");
-            movieCards.forEach((movieCard) => {
-              movieCard.style.boxShadow = `0px 0px 10px 3px rgba(${getColorCode(
-                color
-              )}, 0.5)`;
-            });
 
             searchMovies(searchInput.value.trim(), currentPage);
           })

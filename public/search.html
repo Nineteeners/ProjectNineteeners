@@ -4,6 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <title>Movie Search App</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
     <style>
       /* Basic CSS for the page layout */
       body {
@@ -57,16 +62,25 @@
   </head>
   <body>
     <h1>Movie Search App</h1>
-    <div class="search-container">
-      <label for="search-input">Search for a movie:</label>
-      <input id="search-input" type="text" />
-      <button id="search-button">Search</button>
+    <div class="search-container input-group mb-3">
+      <label for="search-input" class="input-group-prepend">
+        <span class="input-group-text">Search for a movie:</span>
+      </label>
+      <input id="search-input" type="text" class="form-control" />
+      <div class="input-group-append">
+        <button id="search-button" class="btn btn-outline-secondary">
+          Search
+        </button>
+      </div>
     </div>
+
     <div class="movies-container"></div>
 
     <!-- Add previous and next buttons to the HTML -->
-    <button id="previous-button" disabled>Previous</button>
-    <button id="next-button" disabled>Next</button>
+    <button id="previous-button" class="btn btn-primary mr-2" disabled>
+      Previous
+    </button>
+    <button id="next-button" class="btn btn-primary" disabled>Next</button>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -150,6 +164,18 @@
         if (query.length > 0) {
           currentPage = 1;
           searchMovies(query, currentPage);
+        }
+      });
+
+      searchInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const query = searchInput.value.trim();
+
+          if (query.length > 0) {
+            currentPage = 1;
+            searchMovies(query, currentPage);
+          }
         }
       });
     </script>

@@ -267,6 +267,25 @@
             console.error(error);
           });
       }
+      async function getTheme() {
+        try {
+          const response = await axios.get("/theme");
+          const color = response.data.color;
+
+          // Update the background color
+          const body = document.querySelector("body");
+          body.classList.remove(
+            "bg-red",
+            "bg-green",
+            "bg-blue",
+            "bg-yellow",
+            "bg-purple"
+          );
+          body.classList.add(`bg-${color}`);
+        } catch (error) {
+          console.error(error);
+        }
+      }
 
       function getColorCode(color) {
         switch (color) {
@@ -306,6 +325,10 @@
             searchMovies(query, currentPage);
           }
         }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getTheme();
       });
     </script>
   </body>

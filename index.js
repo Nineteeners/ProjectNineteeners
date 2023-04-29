@@ -140,7 +140,7 @@ app.get("/search/:query/:page", async (req, res) => {
   const { query, page } = req.params;
 
   // Set the number of results per page
-  const perPage = 9;
+  const perPage = 6;
 
   try {
     // Fetch movie data from API with pagination

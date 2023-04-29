@@ -6,8 +6,78 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <!-- Navbar HTML -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">Chromatic Cinema </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/search.html">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile.html">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/signUp.html">Sign Up</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="themesDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Themes
+            </a>
+            <div class="dropdown-menu" aria-labelledby="themesDropdown">
+              <a class="dropdown-item" href="#" onclick="setTheme('red')"
+                >Red</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('green')"
+                >Green</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('blue')"
+                >Blue</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('yellow')"
+                >Yellow</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('purple')"
+                >Purple</a
+              >
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
     Home Page
   </body>
 </html>

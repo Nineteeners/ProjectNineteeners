@@ -2,6 +2,8 @@ const axios = require("axios");
 const express = require("express");
 const sharp = require("sharp");
 const admin = require("firebase-admin");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const mongoose = require("mongoose");
 
 const app = express();
 app.use(express.static("./public"));
@@ -13,6 +15,23 @@ let themeColor = "green";
 const apiEndpoint = "https://api.themoviedb.org/3/movie/{movieId}";
 const apiKey = "7cc158372c00b8d6218089b844305d59";
 const language = "en-US";
+
+//Connect to db
+const uri = `mongodb+srv://dbUser:dbPassword@clusterchromaticcinema.cdhfty9.mongodb.net/admin?retryWrites=true&w=majority`;
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.once("open", () => console.log("Connected to MongoDB"));
+
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  username: { type: String, required: true },
+  favorite_movies: [{ type: Number, required: true }],
+  uid: { type: String, required: true },
+});
+
+const User = mongoose.model("User", userSchema);
 
 //Initilize Firebase Admin
 const serviceAccount = require("./chromatic-cinema-firebase-adminsdk-i6t8s-49bf2f33ad.json");

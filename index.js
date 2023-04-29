@@ -1,6 +1,7 @@
 const axios = require("axios");
 const express = require("express");
 const sharp = require("sharp");
+const admin = require("firebase-admin");
 
 const app = express();
 app.use(express.static("./public"));
@@ -12,6 +13,14 @@ let themeColor = "green";
 const apiEndpoint = "https://api.themoviedb.org/3/movie/{movieId}";
 const apiKey = "7cc158372c00b8d6218089b844305d59";
 const language = "en-US";
+
+//Initilize Firebase Admin
+const serviceAccount = require("./chromatic-cinema-firebase-adminsdk-i6t8s-49bf2f33ad.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const auth = admin.auth();
 
 const colorSynonyms = {
   red: ["Crimson", "Scarlet", "Burgundy", "Cherry", "Ruby", "Rose", "Maroon"],
@@ -242,6 +251,40 @@ app.get("/top_rated", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");
+  }
+});
+
+// Signup endpoint
+app.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const userRecord = await auth.createUser({ email, password });
+    res.status(201).json({ uid: userRecord.uid });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Login endpoint
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const userRecord = await auth.getUserByEmail(email);
+    const uid = userRecord.uid;
+
+    // Here, we're assuming the password is stored in the 'password' custom claim.
+    // This is not recommended for production. Use a secure method to verify the password.
+    if (userRecord.customClaims.password === password) {
+      res.status(200).json({ uid: uid });
+    } else {
+      res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
   }
 });
 

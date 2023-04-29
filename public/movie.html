@@ -4,15 +4,75 @@
   <head>
     <meta charset="UTF-8" />
     <title>Movie Poster Tinter</title>
-    <style>
-      /* Set fixed size for poster image */
-      #poster {
-        width: 300px;
-        height: 450px;
-      }
-    </style>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <!-- Navbar HTML -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Movie Search App</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/search.html">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Profile</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="themesDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Themes
+            </a>
+            <div class="dropdown-menu" aria-labelledby="themesDropdown">
+              <a class="dropdown-item" href="#" onclick="setTheme('red')"
+                >Red</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('green')"
+                >Green</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('blue')"
+                >Blue</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('yellow')"
+                >Yellow</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('purple')"
+                >Purple</a
+              >
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <div id="container" style="display: none">
       <h1 id="title"></h1>
       <img id="poster" src="" alt="Poster" />
@@ -22,6 +82,7 @@
       <p id="budget"></p>
       <ul id="genres"></ul>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
       // Get movie ID from URL query string
@@ -30,39 +91,113 @@
       const movieId = urlParams.get("id");
 
       // Fetch movie data from API
-      fetch(`http://localhost:3001/movie/${movieId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          // Update title and poster image
-          const container = document.getElementById("container");
-          container.style.display = "block";
+      function getMovie(movieId) {
+        const url = `http://localhost:3001/movie/${movieId}`;
 
-          const title = document.getElementById("title");
-          title.innerHTML = data.title;
+        axios
+          .get(url)
+          .then((response) => {
+            const data = response.data;
 
-          const poster = document.getElementById("poster");
-          poster.src = data.poster;
+            // Update title and poster image
+            const container = document.getElementById("container");
+            container.style.display = "block";
 
-          const overview = document.getElementById("overview");
-          overview.innerHTML = data.overview;
+            const title = document.getElementById("title");
+            title.innerHTML = data.title;
 
-          const voteAverage = document.getElementById("vote_average");
-          voteAverage.innerHTML = `Average rating: ${data.vote_average}`;
+            const poster = document.getElementById("poster");
+            poster.src = data.poster;
 
-          const voteCount = document.getElementById("vote_count");
-          voteCount.innerHTML = `Number of votes: ${data.vote_count}`;
+            const overview = document.getElementById("overview");
+            overview.innerHTML = data.overview;
 
-          const budget = document.getElementById("budget");
-          budget.innerHTML = `Budget: ${data.budget}`;
+            const voteAverage = document.getElementById("vote_average");
+            voteAverage.innerHTML = `Average rating: ${data.vote_average}`;
 
-          const genres = document.getElementById("genres");
-          data.genres.forEach((genre) => {
-            const li = document.createElement("li");
-            li.innerHTML = genre.name;
-            genres.appendChild(li);
+            const voteCount = document.getElementById("vote_count");
+            voteCount.innerHTML = `Number of votes: ${data.vote_count}`;
+
+            const budget = document.getElementById("budget");
+            budget.innerHTML = `Budget: ${data.budget}`;
+
+            const genres = document.getElementById("genres");
+            genres.innerHTML = "";
+            data.genres.forEach((genre) => {
+              const li = document.createElement("li");
+              li.innerHTML = genre.name;
+              genres.appendChild(li);
+            });
+          })
+          .catch((error) => {
+            console.log(error);
           });
-        })
-        .catch((error) => console.log(error));
+      }
+
+      function setTheme(color) {
+        axios
+          .post("/theme", { color: color })
+          .then((response) => {
+            console.log("Theme color updated:", response.data.color);
+
+            // Update the background color
+            const body = document.querySelector("body");
+            body.classList.remove(
+              "bg-red",
+              "bg-green",
+              "bg-blue",
+              "bg-yellow",
+              "bg-purple"
+            );
+            body.classList.add(`bg-${color}`);
+
+            getMovie(movieId);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      async function getTheme() {
+        try {
+          const response = await axios.get("/theme");
+          const color = response.data.color;
+
+          // Update the background color
+          const body = document.querySelector("body");
+          body.classList.remove(
+            "bg-red",
+            "bg-green",
+            "bg-blue",
+            "bg-yellow",
+            "bg-purple"
+          );
+          body.classList.add(`bg-${color}`);
+          getMovie(movieId);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      function getColorCode(color) {
+        switch (color) {
+          case "red":
+            return "255, 0, 0";
+          case "green":
+            return "0, 255, 0";
+          case "blue":
+            return "0, 0, 255";
+          case "yellow":
+            return "255, 255, 0";
+          case "purple":
+            return "128, 0, 128";
+          default:
+            return "0, 0, 0";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getTheme();
+      });
     </script>
   </body>
 </html>

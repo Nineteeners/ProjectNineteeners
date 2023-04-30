@@ -69,7 +69,7 @@
           <li class="nav-item">
             <a class="nav-link" href="/profile.html">Profile</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="signupNavItem">
             <a class="nav-link" href="/signUp.html">Sign Up</a>
           </li>
           <li class="nav-item dropdown">
@@ -120,7 +120,8 @@
       <button id="loginButton">Login</button>
     </div>
 
-    <!-- Include Firebase scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
@@ -169,6 +170,7 @@
             localStorage.setItem("token", token);
             alert("User logged in successfully!");
             document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
           } catch (error) {
             console.error(error);
             alert("Failed to log in.");
@@ -183,6 +185,7 @@
             await firebase.auth().signOut();
             localStorage.removeItem("token");
             document.getElementById("logoutNavItem").style.display = "none";
+            document.getElementById("signupNavItem").style.display = "block";
             alert("User logged out successfully!");
           } catch (error) {
             console.error(error);
@@ -190,16 +193,84 @@
           }
         });
 
-      initializeFirebase().catch((error) => {
-        console.error("Failed to initialize Firebase:", error);
-      });
+      initializeFirebase()
+        .then(() => {
+          // Check if user is already logged in
+          firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+              document.getElementById("logoutNavItem").style.display = "block";
+            }
+          });
 
-      // Check if user is already logged in
-      firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-          document.getElementById("logoutNavItem").style.display = "block";
+          // Set the theme on page load
+          getTheme();
+        })
+        .catch((error) => {
+          console.error("Failed to initialize Firebase:", error);
+        });
+
+      function setTheme(color) {
+        axios
+          .post("/theme", { color: color })
+          .then((response) => {
+            console.log("Theme color updated:", response.data.color);
+
+            // Update the background color
+            const body = document.querySelector("body");
+            body.classList.remove(
+              "bg-red",
+              "bg-green",
+              "bg-blue",
+              "bg-yellow",
+              "bg-purple"
+            );
+            body.classList.add(`bg-${color}`);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      async function getTheme() {
+        try {
+          const response = await axios.get("/theme");
+          const color = response.data.color;
+
+          // Update the background color
+          const body = document.querySelector("body");
+          body.classList.remove(
+            "bg-red",
+            "bg-green",
+            "bg-blue",
+            "bg-yellow",
+            "bg-purple"
+          );
+          body.classList.add(`bg-${color}`);
+        } catch (error) {
+          console.error(error);
         }
-      });
+      }
+
+      function getColorCode(color) {
+        switch (color) {
+          case "red":
+            return "255, 0, 0";
+          case "green":
+            return "0, 255, 0";
+          case "blue":
+            return "0, 0, 255";
+          case "yellow":
+            return "255, 255, 0";
+          case "purple":
+            return "128, 0, 128";
+          default:
+            return "0, 0, 0";
+        }
+      }
+      setTimeout(function () {
+        if (window.location.search.includes("logged_out=true")) {
+          alert("Need to be logged in to use this feature!");
+        }
+      }, 500);
     </script>
   </body>
 </html>

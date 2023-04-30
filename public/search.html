@@ -186,8 +186,12 @@
       // Update the searchMovies function to take a page parameter
       async function searchMovies(query, page = 1) {
         try {
-          const response = await axios.get(`/search/${query}/${page}`);
-          console.log(response.data.results);
+          const token = localStorage.getItem("token"); // Get the token from local storage
+          const response = await axios.get(`/search/${query}/${page}`, {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          });
           let movies = response.data.results || []; // check if results exist
           const totalPages = response.data.total_pages; // handle total pages count
 

@@ -133,6 +133,31 @@
         updateUI();
       }
 
+      function updateUI() {
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (user) {
+            document.getElementById("searchNavItem").style.display = "block";
+            document.getElementById("profileNavItem").style.display = "block";
+            document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
+          } else {
+            document.getElementById("searchNavItem").style.display = "none";
+            document.getElementById("profileNavItem").style.display = "none";
+            document.getElementById("logoutNavItem").style.display = "none";
+            document.getElementById("signupNavItem").style.display = "block";
+          }
+        });
+      }
+
+      initializeFirebase()
+        .then(() => {
+          // Set the theme on page load
+          getTheme();
+        })
+        .catch((error) => {
+          console.error("Failed to initialize Firebase:", error);
+        });
+
       // Sign up
       document
         .getElementById("signupButton")
@@ -172,6 +197,7 @@
             alert("User logged in successfully!");
             document.getElementById("logoutNavItem").style.display = "block";
             document.getElementById("signupNavItem").style.display = "none";
+            window.location.href = "/index.html";
           } catch (error) {
             console.error(error);
             alert("Failed to log in.");
@@ -191,31 +217,6 @@
             console.error(error);
             alert("Failed to log out.");
           }
-        });
-
-      function updateUI() {
-        firebase.auth().onAuthStateChanged(function (user) {
-          if (user) {
-            document.getElementById("searchNavItem").style.display = "block";
-            document.getElementById("profileNavItem").style.display = "block";
-            document.getElementById("logoutNavItem").style.display = "block";
-            document.getElementById("signupNavItem").style.display = "none";
-          } else {
-            document.getElementById("searchNavItem").style.display = "none";
-            document.getElementById("profileNavItem").style.display = "none";
-            document.getElementById("logoutNavItem").style.display = "none";
-            document.getElementById("signupNavItem").style.display = "block";
-          }
-        });
-      }
-
-      initializeFirebase()
-        .then(() => {
-          // Set the theme on page load
-          getTheme();
-        })
-        .catch((error) => {
-          console.error("Failed to initialize Firebase:", error);
         });
 
       function setTheme(color) {

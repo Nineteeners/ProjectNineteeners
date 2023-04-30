@@ -21,7 +21,7 @@ const dbPassword = process.env.DB_PASSWORD;
 const language = "en-US";
 
 //Connect to db
-const uri = `mongodb+srv://${dbUser}:${dbPassword}@clusterchromaticcinema.cdhfty9.mongodb.net/admin?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${dbUser}:${dbPassword}@clusterchromaticcinema.cdhfty9.mongodb.net/ClusterChromaticCinema?retryWrites=true&w=majority`;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;
@@ -62,6 +62,22 @@ const authMiddleware = async (req, res, next) => {
     res.status(401).send("Unauthorized");
   }
 };
+
+//MongoDB save user
+async function saveUserToDatabase(uid, email) {
+  const newUser = new User({
+    uid: uid,
+    email: email,
+    favorite_movies: [],
+  });
+
+  try {
+    await newUser.save();
+    console.log(`User with uid ${uid} saved to the database`);
+  } catch (error) {
+    console.error(`Error while saving user with uid ${uid}: ${error.message}`);
+  }
+}
 
 const colorSynonyms = {
   red: ["Crimson", "Scarlet", "Burgundy", "Cherry", "Ruby", "Rose", "Maroon"],
@@ -301,12 +317,15 @@ app.get("/profile", authMiddleware, (req, res) => {
   User.findOne({ uid })
     .then((user) => {
       if (!user) {
+        console.error(`User with uid ${uid} not found`);
         return res.status(404).json({ error: "User not found" });
       }
       res.json(user);
     })
     .catch((error) => {
-      console.error(error);
+      console.error(
+        `Error while finding user with uid ${uid}: ${error.message}`
+      );
       res.status(500).json({ error: "Internal server error" });
     });
 });
@@ -317,6 +336,7 @@ app.post("/signup", async (req, res) => {
 
   try {
     const userRecord = await auth.createUser({ email, password });
+    await saveUserToDatabase(userRecord.uid, email);
     res.status(201).json({ uid: userRecord.uid });
   } catch (error) {
     console.error(error);

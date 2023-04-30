@@ -7,97 +7,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile</title>
     <link
-    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="css/styles.css" />
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-  <!-- Add Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-</head>
-<body>
-  <!-- Navbar HTML -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Chromatic Cinema </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNav"
-      aria-controls="navbarNav"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item" id="searchNavItem" style="display: none">
-          <a class="nav-link" href="/search.html">Search</a>
-        </li>
-        <li class="nav-item" id="profileNavItem" style="display: none">
-          <a class="nav-link active" href="/profile.html">Profile</a>
-        </li>
-        <li class="nav-item" id="signupNavItem">
-          <a class="nav-link" href="/signUp.html">Sign Up</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="themesDropdown"
-            role="button"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            Themes
-          </a>
-          <div class="dropdown-menu" aria-labelledby="themesDropdown">
-            <a class="dropdown-item" href="#" onclick="setTheme('red')"
-              >Red</a
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  </head>
+  <body>
+    <!-- Navbar HTML -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">Chromatic Cinema </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item" id="searchNavItem" style="display: none">
+            <a class="nav-link" href="/search.html">Search</a>
+          </li>
+          <li class="nav-item" id="profileNavItem" style="display: none">
+            <a class="nav-link active" href="/profile.html">Profile</a>
+          </li>
+          <li class="nav-item" id="signupNavItem">
+            <a class="nav-link" href="/signUp.html">Sign Up</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="themesDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
-            <a class="dropdown-item" href="#" onclick="setTheme('green')"
-              >Green</a
-            >
-            <a class="dropdown-item" href="#" onclick="setTheme('blue')"
-              >Blue</a
-            >
-            <a class="dropdown-item" href="#" onclick="setTheme('yellow')"
-              >Yellow</a
-            >
-            <a class="dropdown-item" href="#" onclick="setTheme('purple')"
-              >Purple</a
-            >
-          </div>
-        </li>
-        <li class="nav-item" id="logoutNavItem" style="display: none">
-          <a class="nav-link" href="#" id="logoutButton">Log Out</a>
-        </li>
-      </ul>
+              Themes
+            </a>
+            <div class="dropdown-menu" aria-labelledby="themesDropdown">
+              <a class="dropdown-item" href="#" onclick="setTheme('red')"
+                >Red</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('green')"
+                >Green</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('blue')"
+                >Blue</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('yellow')"
+                >Yellow</a
+              >
+              <a class="dropdown-item" href="#" onclick="setTheme('purple')"
+                >Purple</a
+              >
+            </div>
+          </li>
+          <li class="nav-item" id="logoutNavItem" style="display: none">
+            <a class="nav-link" href="#" id="logoutButton">Log Out</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      <h1 id="userEmail"></h1>
+      <h2>Your Favorite Movies</h2>
+      <div id="favoriteMovies" class="movie-cards-container"></div>
     </div>
-  </nav>
-  <div id="container" style="display: none">
-    <h1 id="title"></h1>
-    <img id="poster" src="" alt="Poster" />
-    <h2 id="overview">Overview</h2>
-    <p id="vote_average"></p>
-    <p id="vote_count"></p>
-    <p id="budget"></p>
-    <ul id="genres"></ul>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <script>
-          async function initializeFirebase() {
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+      async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
 
@@ -134,32 +131,98 @@
           console.error("Failed to initialize Firebase:", error);
         });
 
-        async function getUserProfile() {
-          try {
-            const user = firebase.auth().currentUser;
-            const token = await user.getIdToken();
-            
-            const response = await axios.get("/profile", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+      async function getUserProfile() {
+        try {
+          const user = firebase.auth().currentUser;
+          const token = await user.getIdToken();
 
-            const userProfile = response.data;
-            console.log("User Profile:", userProfile);
+          const response = await axios.get("/profile", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-            // You can now use the userProfile data to update the UI or perform other actions
-          } catch (error) {
-            console.error("Error fetching user profile:", error);
-          }
+          const userProfile = response.data;
+          console.log("User Profile:", userProfile);
+
+          document.getElementById(
+            "userEmail"
+          ).textContent = `Welcome, ${user.email}`;
+
+          // Fetch favorite movies
+          const favoritesResponse = await axios.get("/favorites", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const favoriteMovies = Object.values(favoritesResponse.data);
+          console.log("Favorite Movies:", favoriteMovies);
+
+          // Display favorite movies
+          const favoriteMoviesContainer =
+            document.getElementById("favoriteMovies");
+          favoriteMoviesContainer.innerHTML = "";
+          favoriteMovies.forEach((movie) => {
+            const movieCard = createMovieCard(movie);
+            favoriteMoviesContainer.appendChild(movieCard);
+          });
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
         }
+      }
 
+      function createMovieCard(movie) {
+        const movieCard = document.createElement("div");
+        movieCard.classList.add("movie-card");
 
-    function setTheme(color) {
-      axios
-        .post("/theme", { color: color })
-        .then((response) => {
-          console.log("Theme color updated:", response.data.color);
+        const moviePoster = document.createElement("img");
+        moviePoster.classList.add("movie-poster");
+        moviePoster.src = movie.poster;
+        moviePoster.onerror = function () {
+          movieCard.remove();
+        };
+        movieCard.appendChild(moviePoster);
+
+        const movieTitle = document.createElement("div");
+        movieTitle.classList.add("movie-title");
+        movieTitle.textContent = movie.title;
+        movieCard.appendChild(movieTitle);
+
+        // Add click event listener to redirect to movie page
+        movieCard.addEventListener("click", () => {
+          window.location.href = `http://localhost:3001/movie.html?id=${movie.id}`;
+        });
+
+        return movieCard;
+      }
+
+      function setTheme(color) {
+        axios
+          .post("/theme", { color: color })
+          .then((response) => {
+            console.log("Theme color updated:", response.data.color);
+
+            // Update the background color
+            const body = document.querySelector("body");
+            body.classList.remove(
+              "bg-red",
+              "bg-green",
+              "bg-blue",
+              "bg-yellow",
+              "bg-purple"
+            );
+            body.classList.add(`bg-${color}`);
+            getUserProfile();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      async function getTheme() {
+        try {
+          const response = await axios.get("/theme");
+          const color = response.data.color;
 
           // Update the background color
           const body = document.querySelector("body");
@@ -171,49 +234,29 @@
             "bg-purple"
           );
           body.classList.add(`bg-${color}`);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error(error);
-        });
-    }
-    async function getTheme() {
-      try {
-        const response = await axios.get("/theme");
-        const color = response.data.color;
-
-        // Update the background color
-        const body = document.querySelector("body");
-        body.classList.remove(
-          "bg-red",
-          "bg-green",
-          "bg-blue",
-          "bg-yellow",
-          "bg-purple"
-        );
-        body.classList.add(`bg-${color}`);
-      } catch (error) {
-        console.error(error);
+        }
       }
-    }
 
-    function getColorCode(color) {
-      switch (color) {
-        case "red":
-          return "255, 0, 0";
-        case "green":
-          return "0, 255, 0";
-        case "blue":
-          return "0, 0, 255";
-        case "yellow":
-          return "255, 255, 0";
-        case "purple":
-          return "128, 0, 128";
-        default:
-          return "0, 0, 0";
+      function getColorCode(color) {
+        switch (color) {
+          case "red":
+            return "255, 0, 0";
+          case "green":
+            return "0, 255, 0";
+          case "blue":
+            return "0, 0, 255";
+          case "yellow":
+            return "255, 255, 0";
+          case "purple":
+            return "128, 0, 128";
+          default:
+            return "0, 0, 0";
+        }
       }
-    }
 
-          // Log out
+      // Log out
       document
         .getElementById("logoutButton")
         .addEventListener("click", async () => {
@@ -227,5 +270,6 @@
             alert("Failed to log out.");
           }
         });
-  </script>
+    </script>
+  </body>
 </html>

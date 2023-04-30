@@ -91,6 +91,9 @@
       <p id="vote_count"></p>
       <p id="budget"></p>
       <ul id="genres"></ul>
+      <button id="addToFavorites" class="btn btn-primary">
+        Add to Favorites
+      </button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -259,6 +262,33 @@
           } catch (error) {
             console.error(error);
             alert("Failed to log out.");
+          }
+        });
+
+      //Feth request to Favorites
+      document
+        .getElementById("addToFavorites")
+        .addEventListener("click", async () => {
+          try {
+            const auth = firebase.auth();
+            const idToken = await auth.currentUser.getIdToken(
+              /* forceRefresh */ true
+            );
+
+            const response = await axios.post(`/favorites/${movieId}`, null, {
+              headers: { Authorization: `Bearer ${idToken}` },
+            });
+
+            if (response.status === 200) {
+              alert("Movie added to favorites");
+            } else {
+              alert("Failed to add movie to favorites");
+            }
+          } catch (error) {
+            console.error(
+              `Error while adding favorite movie: ${error.message}`
+            );
+            alert("Failed to add movie to favorites");
           }
         });
     </script>

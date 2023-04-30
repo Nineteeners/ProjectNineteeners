@@ -29,9 +29,9 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  favorite_movies: [{ type: Number, required: true }],
-  uid: { type: String, required: true },
+  uid: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  favorite_movies: { type: [Number], default: [] },
 });
 
 const User = mongoose.model("User", userSchema);
@@ -341,6 +341,107 @@ app.post("/signup", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message });
+  }
+});
+
+//List favorites
+app.get("/favorites", authMiddleware, async (req, res) => {
+  const uid = req.user.uid;
+
+  try {
+    const user = await User.findOne({ uid });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const favoriteMoviesPromises = user.favorite_movies.map(async (movieId) => {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/movie/${movieId}`,
+        {
+          params: {
+            api_key: process.env.API_KEY,
+          },
+        }
+      );
+
+      const modifiedResponse = await modifyMovies(response.data, themeColor);
+      return modifiedResponse;
+    });
+
+    const favoriteMovies = await Promise.all(favoriteMoviesPromises);
+    const modifiedFavoriteMovies = favoriteMovies.reduce((acc, movie) => {
+      acc[movie.id] = movie;
+      return acc;
+    }, {});
+
+    res.json(modifiedFavoriteMovies);
+  } catch (error) {
+    console.error("Error fetching favorite movies:", error);
+    res.status(500).json({ error: "Failed to fetch favorite movies" });
+  }
+});
+
+
+//Check if movie in favorites
+app.get("/favorites/check/:movieId", authMiddleware, async (req, res) => {
+  const uid = req.user.uid;
+  const movieId = parseInt(req.params.movieId);
+
+  try {
+    const user = await User.findOne({ uid });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isFavorite = user.favorite_movies.includes(movieId);
+    res.json({ isFavorite });
+  } catch (error) {
+    console.error(`Error while checking favorite movie: ${error.message}`);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//Add to favorites list
+app.post("/favorites/:movieId", authMiddleware, async (req, res) => {
+  const uid = req.user.uid;
+  const movieId = parseInt(req.params.movieId);
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { uid },
+      { $addToSet: { favorite_movies: movieId } }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ message: "Movie added to favorites" });
+  } catch (error) {
+    console.error(`Error while adding favorite movie: ${error.message}`);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//Delete from favorites list
+app.delete("/favorites/:movieId", authMiddleware, async (req, res) => {
+  const uid = req.user.uid;
+  const movieId = parseInt(req.params.movieId);
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { uid },
+      { $pull: { favorite_movies: movieId } }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ message: "Movie removed from favorites" });
+  } catch (error) {
+    console.error(`Error while removing favorite movie: ${error.message}`);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

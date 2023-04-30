@@ -109,7 +109,7 @@
             if (user) {
               getTheme();
             } else {
-              alert("Not logged in!");
+              window.location.href = "/signUp.html?logged_out=true";
             }
           });
         } catch (error) {

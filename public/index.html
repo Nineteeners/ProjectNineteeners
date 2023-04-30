@@ -139,7 +139,14 @@
               img.setAttribute('alt', image.alt);
               slide.appendChild(img);
               carousel.querySelector('.carousel-inner').appendChild(slide);
+
+              slide.addEventListener("click", () => {
+          window.location.href = `http://localhost:3001/movie.html?id=${image.id}`;
+        });
+
             });
+           // window.location.reload();
+
           });
       }
     
@@ -184,6 +191,8 @@
             );
             body.classList.add(`bg-${color}`);
             fetchTopRatedMovies();
+            window.location.reload();
+
           })
           .catch((error) => {
             console.error(error);
@@ -226,7 +235,7 @@
           default:
             return "0, 0, 0";
         }
-        window.location.reload();
+        //swindow.location.reload();
       }
 
       document.addEventListener("DOMContentLoaded", () => {

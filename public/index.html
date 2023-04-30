@@ -112,60 +112,62 @@
       // Get the carousel element
       const carousel = document.getElementById('carouselExampleIndicators');
     
-      // Make a GET request using Axios
-      axios.get('http://localhost:3001/top_rated')
-        .then(response => {
-          // Loop through the response data and create carousel slides
-          response.data.forEach((image, index) => {
-            // Create the carousel indicator
-            const indicator = document.createElement('li');
-            indicator.setAttribute('data-target', '#carouselExampleIndicators');
-            indicator.setAttribute('data-slide-to', index);
-            if (index === 0) {
-              indicator.classList.add('active');
-            }
-            carousel.querySelector('.carousel-indicators').appendChild(indicator);
-    
-            // Create the carousel slide
-            const slide = document.createElement('div');
-            slide.classList.add('carousel-item');
-            if (index === 0) {
-              slide.classList.add('active');
-            }
-            const img = document.createElement('img');
-            img.classList.add('d-block', 'w-100');
-            img.setAttribute('src', image.poster);
-            img.setAttribute('alt', image.alt);
-            slide.appendChild(img);
-            carousel.querySelector('.carousel-inner').appendChild(slide);
+      async function fetchTopRatedMovies() {
+        // Make a GET request using Axios
+        axios.get('http://localhost:3001/top_rated')
+          .then(response => {
+            // Loop through the response data and create carousel slides
+            response.data.forEach((image, index) => {
+              // Create the carousel indicator
+              const indicator = document.createElement('li');
+              indicator.setAttribute('data-target', '#carouselExampleIndicators');
+              indicator.setAttribute('data-slide-to', index);
+              if (index === 0) {
+                indicator.classList.add('active');
+              }
+              carousel.querySelector('.carousel-indicators').appendChild(indicator);
+      
+              // Create the carousel slide
+              const slide = document.createElement('div');
+              slide.classList.add('carousel-item');
+              if (index === 0) {
+                slide.classList.add('active');
+              }
+              const img = document.createElement('img');
+              img.classList.add('d-block', 'w-100');
+              img.setAttribute('src', image.poster);
+              img.setAttribute('alt', image.alt);
+              slide.appendChild(img);
+              carousel.querySelector('.carousel-inner').appendChild(slide);
+            });
           });
-        })
+      }
     
       // Add event listeners to the carousel controls
       const nextButton = document.querySelector('.carousel-control-next');
-nextButton.addEventListener('click', () => {
-  const activeItem = document.querySelector('.carousel-item.active');
-  if (activeItem.nextElementSibling) {
-    activeItem.nextElementSibling.classList.add('active');
-  } else {
-    // If there are no more elements, loop back to the first one
-    carousel.querySelector('.carousel-item:first-child').classList.add('active');
-  }
-  activeItem.classList.remove('active');
-});
+      nextButton.addEventListener('click', () => {
+        const activeItem = document.querySelector('.carousel-item.active');
+        if (activeItem.nextElementSibling) {
+          activeItem.nextElementSibling.classList.add('active');
+        } else {
+          // If there are no more elements, loop back to the first one
+          carousel.querySelector('.carousel-item:first-child').classList.add('active');
+        }
+        activeItem.classList.remove('active');
+      });
 
-const prevButton = document.querySelector('.carousel-control-prev');
-prevButton.addEventListener('click', () => {
-  const activeItem = document.querySelector('.carousel-item.active');
-  if (activeItem.previousElementSibling) {
-    activeItem.previousElementSibling.classList.add('active');
-  } else {
-    // If there are no previous elements, go to the last one
-    carousel.querySelector('.carousel-item:last-child').classList.add('active');
-  }
-  activeItem.classList.remove('active');
-});
-function setTheme(color) {
+      const prevButton = document.querySelector('.carousel-control-prev');
+      prevButton.addEventListener('click', () => {
+        const activeItem = document.querySelector('.carousel-item.active');
+        if (activeItem.previousElementSibling) {
+          activeItem.previousElementSibling.classList.add('active');
+        } else {
+          // If there are no previous elements, go to the last one
+          carousel.querySelector('.carousel-item:last-child').classList.add('active');
+        }
+        activeItem.classList.remove('active');
+      });
+      function setTheme(color) {
         axios
           .post("/theme", { color: color })
           .then((response) => {
@@ -181,8 +183,7 @@ function setTheme(color) {
               "bg-purple"
             );
             body.classList.add(`bg-${color}`);
-
-            searchMovies(searchInput.value.trim(), currentPage);
+            fetchTopRatedMovies();
           })
           .catch((error) => {
             console.error(error);
@@ -203,6 +204,7 @@ function setTheme(color) {
             "bg-purple"
           );
           body.classList.add(`bg-${color}`);
+          fetchTopRatedMovies();
 
         } catch (error) {
           console.error(error);
@@ -225,11 +227,10 @@ function setTheme(color) {
             return "0, 0, 0";
         }
         window.location.reload();
-
-
       }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getTheme();
+      });
     </script>
-       
-          
-  
 </html>

@@ -13,6 +13,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   </head>
   <body>
     <!-- Navbar HTML -->
@@ -34,13 +37,13 @@
           <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/search.html">Search</a>
+          <li class="nav-item" id="searchNavItem" style="display: none">
+            <a class="nav-link active" href="/search.html">Search</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="profileNavItem" style="display: none">
             <a class="nav-link" href="/profile.html">Profile</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="signupNavItem">
             <a class="nav-link" href="/signUp.html">Sign Up</a>
           </li>
           <li class="nav-item dropdown">
@@ -73,6 +76,9 @@
               >
             </div>
           </li>
+          <li class="nav-item" id="logoutNavItem" style="display: none">
+            <a class="nav-link" href="#" id="logoutButton">Log Out</a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -100,6 +106,41 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <script>
+      async function initializeFirebase() {
+        const response = await fetch("/firebaseConfig");
+        const firebaseConfig = await response.json();
+
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        updateUI();
+      }
+
+      function updateUI() {
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (user) {
+            document.getElementById("searchNavItem").style.display = "block";
+            document.getElementById("profileNavItem").style.display = "block";
+            document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
+          } else {
+            document.getElementById("searchNavItem").style.display = "none";
+            document.getElementById("profileNavItem").style.display = "none";
+            document.getElementById("logoutNavItem").style.display = "none";
+            document.getElementById("signupNavItem").style.display = "block";
+            window.location.href = "/signUp.html?logged_out=true";
+          }
+        });
+      }
+
+      initializeFirebase()
+        .then(() => {
+          // Set the theme on page load
+          getTheme();
+        })
+        .catch((error) => {
+          console.error("Failed to initialize Firebase:", error);
+        });
       // Add event listeners for the previous and next buttons
       const previousButton = document.getElementById("previous-button");
       const nextButton = document.getElementById("next-button");
@@ -190,7 +231,6 @@
               "bg-purple"
             );
             body.classList.add(`bg-${color}`);
-
             searchMovies(searchInput.value.trim(), currentPage);
           })
           .catch((error) => {
@@ -212,6 +252,7 @@
             "bg-purple"
           );
           body.classList.add(`bg-${color}`);
+          searchMovies(searchInput.value.trim(), currentPage);
         } catch (error) {
           console.error(error);
         }
@@ -257,9 +298,20 @@
         }
       });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        getTheme();
-      });
+      // Log out
+      document
+        .getElementById("logoutButton")
+        .addEventListener("click", async () => {
+          try {
+            await firebase.auth().signOut();
+            localStorage.removeItem("token");
+            alert("User logged out successfully!");
+            window.location.href = "/index.html";
+          } catch (error) {
+            console.error(error);
+            alert("Failed to log out.");
+          }
+        });
     </script>
   </body>
 </html>

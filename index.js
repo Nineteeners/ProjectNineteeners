@@ -186,7 +186,7 @@ app.get("/movie/:id", authMiddleware, async (req, res) => {
 });
 
 // API endpoint to search for movies with pagination
-app.get("/search/:query/:page", async (req, res) => {
+app.get("/search/:query/:page", authMiddleware, async (req, res) => {
   const { query, page } = req.params;
 
   // Set the number of results per page

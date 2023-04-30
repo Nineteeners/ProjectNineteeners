@@ -71,18 +71,18 @@ body {
     font-weight: bold;
   }
 
-/* Set fixed size for poster image */
-#poster {
+  /* Set fixed size for poster image */
+  #poster {
     width: 300px;
     height: 450px;
-    }
-    .carousel-item img {
-      width: 800px;
-      height: 400px;
-      object-fit: cover;
-    }
-    #title{
-      margin: auto;
-
-    }
+  }
+  .carousel-item img {
+    width: 800px;
+    height: 400px;
+    object-fit: cover;
+  }
+  #title{
+    margin: auto;
+  
+  }
   

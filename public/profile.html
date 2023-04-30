@@ -40,13 +40,13 @@
         <li class="nav-item">
           <a class="nav-link" href="/">Home</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" id="searchNavItem" style="display: none">
           <a class="nav-link" href="/search.html">Search</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/profile.html">Profile</a>
+        <li class="nav-item" id="profileNavItem" style="display: none">
+          <a class="nav-link active" href="/profile.html">Profile</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" id="signupNavItem">
           <a class="nav-link" href="/signUp.html">Sign Up</a>
         </li>
         <li class="nav-item dropdown">
@@ -79,6 +79,9 @@
             >
           </div>
         </li>
+        <li class="nav-item" id="logoutNavItem" style="display: none">
+          <a class="nav-link" href="#" id="logoutButton">Log Out</a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -94,32 +97,41 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script>
-    async function initializeFirebase() {
-      try {
+          async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
 
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
         }
-        const auth = firebase.auth();
+        updateUI();
+      }
 
-        //onAuthStateChanged function
-        auth.onAuthStateChanged((user) => {
-          const profileNavItem = document.getElementById("profileNavItem");
-          const signUpNavItem = document.getElementById("signUpNavItem");
+      function updateUI() {
+        firebase.auth().onAuthStateChanged(function (user) {
           if (user) {
-            getTheme();
+            document.getElementById("searchNavItem").style.display = "block";
+            document.getElementById("profileNavItem").style.display = "block";
+            document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
           } else {
+            document.getElementById("searchNavItem").style.display = "none";
+            document.getElementById("profileNavItem").style.display = "none";
+            document.getElementById("logoutNavItem").style.display = "none";
+            document.getElementById("signupNavItem").style.display = "block";
             window.location.href = "/signUp.html?logged_out=true";
           }
         });
-      } catch (error) {
-        console.error("Failed to initialize Firebase:", error);
       }
-    }
 
-    initializeFirebase();
+      initializeFirebase()
+        .then(() => {
+          // Set the theme on page load
+          getTheme();
+        })
+        .catch((error) => {
+          console.error("Failed to initialize Firebase:", error);
+        });
     function setTheme(color) {
       axios
         .post("/theme", { color: color })
@@ -177,5 +189,20 @@
           return "0, 0, 0";
       }
     }
+
+          // Log out
+      document
+        .getElementById("logoutButton")
+        .addEventListener("click", async () => {
+          try {
+            await firebase.auth().signOut();
+            localStorage.removeItem("token");
+            alert("User logged out successfully!");
+            window.location.href = "/index.html";
+          } catch (error) {
+            console.error(error);
+            alert("Failed to log out.");
+          }
+        });
   </script>
 </html>

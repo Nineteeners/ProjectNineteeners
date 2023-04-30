@@ -13,6 +13,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   </head>
   <body>
     <!-- Navbar HTML -->
@@ -88,53 +92,86 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
+      async function initializeFirebase() {
+        try {
+          const response = await fetch("/firebaseConfig");
+          const firebaseConfig = await response.json();
+
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          const auth = firebase.auth();
+
+          //onAuthStateChanged function
+          auth.onAuthStateChanged((user) => {
+            const profileNavItem = document.getElementById("profileNavItem");
+            const signUpNavItem = document.getElementById("signUpNavItem");
+            if (user) {
+              getTheme();
+            } else {
+              alert("Not logged in!");
+            }
+          });
+        } catch (error) {
+          console.error("Failed to initialize Firebase:", error);
+        }
+      }
+
+      initializeFirebase();
       // Get movie ID from URL query string
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const movieId = urlParams.get("id");
 
       // Fetch movie data from API
-      function getMovie(movieId) {
+      async function getMovie(movieId) {
         const url = `http://localhost:3001/movie/${movieId}`;
 
-        axios
-          .get(url)
-          .then((response) => {
-            const data = response.data;
+        try {
+          const auth = firebase.auth();
+          const idToken = await auth.currentUser.getIdToken(
+            /* forceRefresh */ true
+          );
 
-            // Update title and poster image
-            const container = document.getElementById("container");
-            container.style.display = "block";
-
-            const title = document.getElementById("title");
-            title.innerHTML = data.title;
-
-            const poster = document.getElementById("poster");
-            poster.src = data.poster;
-
-            const overview = document.getElementById("overview");
-            overview.innerHTML = data.overview;
-
-            const voteAverage = document.getElementById("vote_average");
-            voteAverage.innerHTML = `Average rating: ${data.vote_average}`;
-
-            const voteCount = document.getElementById("vote_count");
-            voteCount.innerHTML = `Number of votes: ${data.vote_count}`;
-
-            const budget = document.getElementById("budget");
-            budget.innerHTML = `Budget: ${data.budget}`;
-
-            const genres = document.getElementById("genres");
-            genres.innerHTML = "";
-            data.genres.forEach((genre) => {
-              const li = document.createElement("li");
-              li.innerHTML = genre.name;
-              genres.appendChild(li);
-            });
-          })
-          .catch((error) => {
-            console.log(error);
+          const response = await axios.get(url, {
+            headers: { Authorization: `Bearer ${idToken}` },
           });
+
+          const data = response.data;
+
+          // Update title and poster image
+          const container = document.getElementById("container");
+          container.style.display = "block";
+
+          const title = document.getElementById("title");
+          title.innerHTML = data.title;
+
+          const poster = document.getElementById("poster");
+          poster.src = data.poster;
+
+          const overview = document.getElementById("overview");
+          overview.innerHTML = data.overview;
+
+          const voteAverage = document.getElementById("vote_average");
+          voteAverage.innerHTML = `Average rating: ${data.vote_average}`;
+
+          const voteCount = document.getElementById("vote_count");
+          voteCount.innerHTML = `Number of votes: ${data.vote_count}`;
+
+          const budget = document.getElementById("budget");
+          budget.innerHTML = `Budget: ${data.budget}`;
+
+          const genres = document.getElementById("genres");
+          genres.innerHTML = "";
+          data.genres.forEach((genre) => {
+            const li = document.createElement("li");
+            li.innerHTML = genre.name;
+            genres.appendChild(li);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("Failed to fetch movie.");
+        }
       }
 
       function setTheme(color) {
@@ -197,10 +234,6 @@
             return "0, 0, 0";
         }
       }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        getTheme();
-      });
     </script>
   </body>
 </html>

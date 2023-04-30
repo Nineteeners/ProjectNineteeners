@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 app.use(express.static("./public"));
+app.use("/firebaseConfig", express.static("firebaseConfig.json"));
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
@@ -26,7 +27,7 @@ db.once("open", () => console.log("Connected to MongoDB"));
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
-  username: { type: String, required: true },
+  //username: { type: String, required: true },
   favorite_movies: [{ type: Number, required: true }],
   uid: { type: String, required: true },
 });
@@ -40,6 +41,25 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
+
+//Authurization middleware
+const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(401).send("Unauthorized");
+  }
+};
 
 const colorSynonyms = {
   red: ["Crimson", "Scarlet", "Burgundy", "Cherry", "Ruby", "Rose", "Maroon"],
@@ -136,7 +156,7 @@ app.get("/", (req, res) => {
 });
 
 //API endpoint to fetch movie dat
-app.get("/movie/:id", async (req, res) => {
+app.get("/movie/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -273,6 +293,22 @@ app.get("/top_rated", async (req, res) => {
   }
 });
 
+app.get("/profile", authMiddleware, (req, res) => {
+  const uid = req.user.uid;
+
+  User.findOne({ uid })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json(user);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
 // Signup endpoint
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
@@ -280,27 +316,6 @@ app.post("/signup", async (req, res) => {
   try {
     const userRecord = await auth.createUser({ email, password });
     res.status(201).json({ uid: userRecord.uid });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ error: error.message });
-  }
-});
-
-// Login endpoint
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const userRecord = await auth.getUserByEmail(email);
-    const uid = userRecord.uid;
-
-    // Here, we're assuming the password is stored in the 'password' custom claim.
-    // This is not recommended for production. Use a secure method to verify the password.
-    if (userRecord.customClaims.password === password) {
-      res.status(200).json({ uid: uid });
-    } else {
-      res.status(401).json({ error: "Invalid credentials" });
-    }
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message });

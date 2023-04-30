@@ -38,6 +38,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   </head>
   <body>
     <!-- Navbar HTML -->
@@ -98,6 +102,9 @@
               >
             </div>
           </li>
+          <li class="nav-item" id="logoutNavItem" style="display: none">
+            <a class="nav-link" href="/signUp.html" id="logoutButton">Log Out</a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -115,6 +122,15 @@
 
     <!-- Include Firebase scripts -->
     <script>
+      async function initializeFirebase() {
+        const response = await fetch("/firebaseConfig");
+        const firebaseConfig = await response.json();
+
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+      }
+
       // Sign up
       document
         .getElementById("signupButton")
@@ -146,22 +162,39 @@
           const email = document.getElementById("loginEmail").value;
           const password = document.getElementById("loginPassword").value;
           try {
-            const response = await fetch("http://localhost:3001/login", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
-            });
-
-            if (response.ok) {
-              alert("User logged in successfully!");
-            } else {
-              throw new Error(await response.text());
-            }
+            const userCredential = await firebase
+              .auth()
+              .signInWithEmailAndPassword(email, password);
+            const token = await userCredential.user.getIdToken();
+            localStorage.setItem("token", token);
+            alert("User logged in successfully!");
           } catch (error) {
             console.error(error);
             alert("Failed to log in.");
           }
+          if (response.ok) {
+            document.getElementById("logoutNavItem").style.display = "block";
+          }
         });
+
+      // Log out
+      document
+        .getElementById("logoutButton")
+        .addEventListener("click", async () => {
+          try {
+            await firebase.auth().signOut();
+            localStorage.removeItem("token");
+            document.getElementById("logoutNavItem").style.display = "none";
+            alert("User logged out successfully!");
+          } catch (error) {
+            console.error(error);
+            alert("Failed to log out.");
+          }
+        });
+
+      initializeFirebase().catch((error) => {
+        console.error("Failed to initialize Firebase:", error);
+      });
     </script>
   </body>
 </html>

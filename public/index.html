@@ -5,21 +5,34 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="css/styles.css" />
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+       <!-- Include Bootstrap's JavaScript library -->
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+    <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  
+  <link rel="stylesheet" href="css/styles.css" />
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- Include jQuery from a CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Bootstrap's JavaScript library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+
+    <title>Home</title>
   </head>
   <body>
-    <!-- Navbar HTML -->
+    Home Page
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/">Chromatic Cinema </a>
+      <a class="navbar-brand" href="#">Movie Search App</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -45,6 +58,7 @@
           <li class="nav-item">
             <a class="nav-link" href="/signUp.html">Sign Up</a>
           </li>
+
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -78,6 +92,144 @@
         </ul>
       </div>
     </nav>
-    Home Page
-  </body>
+    <div id="title">
+      <h1>    Top Rated Movies</h1>
+    </div>
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators"></ol>
+      <div class="carousel-inner"></div>
+      <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+    
+    <script>
+      // Get the carousel element
+      const carousel = document.getElementById('carouselExampleIndicators');
+    
+      // Make a GET request using Axios
+      axios.get('http://localhost:3001/top_rated')
+        .then(response => {
+          // Loop through the response data and create carousel slides
+          response.data.forEach((image, index) => {
+            // Create the carousel indicator
+            const indicator = document.createElement('li');
+            indicator.setAttribute('data-target', '#carouselExampleIndicators');
+            indicator.setAttribute('data-slide-to', index);
+            if (index === 0) {
+              indicator.classList.add('active');
+            }
+            carousel.querySelector('.carousel-indicators').appendChild(indicator);
+    
+            // Create the carousel slide
+            const slide = document.createElement('div');
+            slide.classList.add('carousel-item');
+            if (index === 0) {
+              slide.classList.add('active');
+            }
+            const img = document.createElement('img');
+            img.classList.add('d-block', 'w-100');
+            img.setAttribute('src', image.poster);
+            img.setAttribute('alt', image.alt);
+            slide.appendChild(img);
+            carousel.querySelector('.carousel-inner').appendChild(slide);
+          });
+        })
+    
+      // Add event listeners to the carousel controls
+      const nextButton = document.querySelector('.carousel-control-next');
+nextButton.addEventListener('click', () => {
+  const activeItem = document.querySelector('.carousel-item.active');
+  if (activeItem.nextElementSibling) {
+    activeItem.nextElementSibling.classList.add('active');
+  } else {
+    // If there are no more elements, loop back to the first one
+    carousel.querySelector('.carousel-item:first-child').classList.add('active');
+  }
+  activeItem.classList.remove('active');
+});
+
+const prevButton = document.querySelector('.carousel-control-prev');
+prevButton.addEventListener('click', () => {
+  const activeItem = document.querySelector('.carousel-item.active');
+  if (activeItem.previousElementSibling) {
+    activeItem.previousElementSibling.classList.add('active');
+  } else {
+    // If there are no previous elements, go to the last one
+    carousel.querySelector('.carousel-item:last-child').classList.add('active');
+  }
+  activeItem.classList.remove('active');
+});
+function setTheme(color) {
+        axios
+          .post("/theme", { color: color })
+          .then((response) => {
+            console.log("Theme color updated:", response.data.color);
+
+            // Update the background color
+            const body = document.querySelector("body");
+            body.classList.remove(
+              "bg-red",
+              "bg-green",
+              "bg-blue",
+              "bg-yellow",
+              "bg-purple"
+            );
+            body.classList.add(`bg-${color}`);
+
+            searchMovies(searchInput.value.trim(), currentPage);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      async function getTheme() {
+        try {
+          const response = await axios.get("/theme");
+          const color = response.data.color;
+
+          // Update the background color
+          const body = document.querySelector("body");
+          body.classList.remove(
+            "bg-red",
+            "bg-green",
+            "bg-blue",
+            "bg-yellow",
+            "bg-purple"
+          );
+          body.classList.add(`bg-${color}`);
+
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      function getColorCode(color) {
+        switch (color) {
+          case "red":
+            return "255, 0, 0";
+          case "green":
+            return "0, 255, 0";
+          case "blue":
+            return "0, 0, 255";
+          case "yellow":
+            return "255, 255, 0";
+          case "purple":
+            return "128, 0, 128";
+          default:
+            return "0, 0, 0";
+        }
+        window.location.reload();
+
+
+      }
+    </script>
+       
+          
+  
 </html>

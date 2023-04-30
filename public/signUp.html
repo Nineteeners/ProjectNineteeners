@@ -63,14 +63,14 @@
           <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="searchNavItem" style="display: none">
             <a class="nav-link" href="/search.html">Search</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="profileNavItem" style="display: none">
             <a class="nav-link" href="/profile.html">Profile</a>
           </li>
           <li class="nav-item" id="signupNavItem">
-            <a class="nav-link" href="/signUp.html">Sign Up</a>
+            <a class="nav-link active" href="/signUp.html">Sign Up</a>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -130,6 +130,7 @@
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
         }
+        updateUI();
       }
 
       // Sign up
@@ -184,24 +185,32 @@
           try {
             await firebase.auth().signOut();
             localStorage.removeItem("token");
-            document.getElementById("logoutNavItem").style.display = "none";
-            document.getElementById("signupNavItem").style.display = "block";
             alert("User logged out successfully!");
+            window.location.href = "/index.html";
           } catch (error) {
             console.error(error);
             alert("Failed to log out.");
           }
         });
 
+      function updateUI() {
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (user) {
+            document.getElementById("searchNavItem").style.display = "block";
+            document.getElementById("profileNavItem").style.display = "block";
+            document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
+          } else {
+            document.getElementById("searchNavItem").style.display = "none";
+            document.getElementById("profileNavItem").style.display = "none";
+            document.getElementById("logoutNavItem").style.display = "none";
+            document.getElementById("signupNavItem").style.display = "block";
+          }
+        });
+      }
+
       initializeFirebase()
         .then(() => {
-          // Check if user is already logged in
-          firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-              document.getElementById("logoutNavItem").style.display = "block";
-            }
-          });
-
           // Set the theme on page load
           getTheme();
         })

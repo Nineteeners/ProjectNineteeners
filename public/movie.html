@@ -104,8 +104,6 @@
 
           //onAuthStateChanged function
           auth.onAuthStateChanged((user) => {
-            const profileNavItem = document.getElementById("profileNavItem");
-            const signUpNavItem = document.getElementById("signUpNavItem");
             if (user) {
               getTheme();
             } else {

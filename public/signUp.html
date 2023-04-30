@@ -103,7 +103,7 @@
             </div>
           </li>
           <li class="nav-item" id="logoutNavItem" style="display: none">
-            <a class="nav-link" href="/signUp.html" id="logoutButton">Log Out</a>
+            <a class="nav-link" href="#" id="logoutButton">Log Out</a>
           </li>
         </ul>
       </div>
@@ -168,12 +168,10 @@
             const token = await userCredential.user.getIdToken();
             localStorage.setItem("token", token);
             alert("User logged in successfully!");
+            document.getElementById("logoutNavItem").style.display = "block";
           } catch (error) {
             console.error(error);
             alert("Failed to log in.");
-          }
-          if (response.ok) {
-            document.getElementById("logoutNavItem").style.display = "block";
           }
         });
 
@@ -194,6 +192,13 @@
 
       initializeFirebase().catch((error) => {
         console.error("Failed to initialize Firebase:", error);
+      });
+
+      // Check if user is already logged in
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          document.getElementById("logoutNavItem").style.display = "block";
+        }
       });
     </script>
   </body>

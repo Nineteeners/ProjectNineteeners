@@ -82,6 +82,8 @@ body {
   #poster {
     width: 300px;
     height: 450px;
+    margin-right: auto;
+    float: right;
   }
   .carousel-item img {
     width: 800px;
@@ -89,7 +91,11 @@ body {
     object-fit: cover;
   }
   #title{
-    margin: auto;
+    margin: right;
   
+  }
+  #moviemovie{
+    margin: right;
+    
   }
   

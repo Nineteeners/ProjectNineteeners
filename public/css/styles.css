@@ -85,10 +85,15 @@ body {
     margin-right: auto;
     float: right;
   }
+  .carousel {
+    width: 400px; /* Replace with desired width */
+    height: 200px; /* Replace with desired height */
+  }
+  
   .carousel-item img {
-    width: 800px;
-    height: 400px;
-    object-fit: cover;
+    width: 100px; /* Set image width to 100% to fit the container */
+    height: 50px; /* Set image height to 100% to fit the container */
+    object-fit: cover; /* Scale the image to cover the container while maintaining aspect ratio */
   }
   #title{
     margin: right;

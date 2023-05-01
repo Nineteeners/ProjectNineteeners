@@ -115,4 +115,11 @@ body {
 
   #userEmail{
     margin: auto;
+    text-align: center;
+
+  }
+  #favorite{
+    margin: auto;
+    text-align: center;
+
   }

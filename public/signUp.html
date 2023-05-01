@@ -215,11 +215,14 @@
           const email = document.getElementById("signupEmail").value;
           const password = document.getElementById("signupPassword").value;
           try {
-            const response = await fetch("http://localhost:3001/signup", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
-            });
+            const response = await fetch(
+              "https://chromatic-cinema.herokuapp.com/signup",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+              }
+            );
 
             if (response.ok) {
               alert("User signed up successfully!");

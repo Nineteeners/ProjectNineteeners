@@ -177,7 +177,7 @@
 
       async function fetchTopRatedMovies() {
         // Make a GET request using Axios
-        axios.get("http://localhost:3001/top_rated").then((response) => {
+        axios.get("https://chromatic-cinema.herokuapp.com/top_rated").then((response) => {
           const owlCarousel = $("#owl-carousel");
           owlCarousel.html("");
           response.data.forEach((image) => {
@@ -185,7 +185,7 @@
               `<div class="item"><img src="${image.poster}" alt="${image.alt}" /></div>`
             );
             slide.on("click", () => {
-              window.location.href = `http://localhost:3001/movie.html?id=${image.id}`;
+              window.location.href = `https://chromatic-cinema.herokuapp.com/movie.html?id=${image.id}`;
             });
             owlCarousel.append(slide);
           });
@@ -231,7 +231,7 @@
       });
       async function fetchPopular() {
         try {
-          const response = await axios.get("http://localhost:3001/popular");
+          const response = await axios.get("https://chromatic-cinema.herokuapp.com/popular");
 
           const popular = response.data;
           //console.log("Popular content:", popular);
@@ -270,7 +270,7 @@
 
         // Add click event listener to redirect to movie page
         movieCard.addEventListener("click", () => {
-          window.location.href = `http://localhost:3001/movie.html?id=${movie.id}`;
+          window.location.href = `https://chromatic-cinema.herokuapp.com/movie.html?id=${movie.id}`;
         });
 
         return movieCard;

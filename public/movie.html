@@ -86,9 +86,10 @@
     <h1 id="title"></h1>
 
     <div class="row">
-      <div class="col-sm-6" id = "moviemovie" >
-        <img id="poster" src="" alt="Poster" />
+      <div class="col-sm-6" id="moviemovie">
+        <img id="poster" src="" alt="Poster" style="display: none" />
       </div>
+<<<<<<< HEAD
       <div class="col-lg-6"  >
       <h2  class="border border-dark" id="overview">Overview</h2>
       <p id="vote_average"></p>
@@ -101,6 +102,25 @@
   
     <div id="container" style="display: none">
       <button id="addToFavorites" class="btn btn-primary">
+=======
+      <div class="col-lg-6" style="display: none">
+        <h2 id="overview">Overview</h2>
+        <p id="vote_average"></p>
+        <p id="vote_count"></p>
+        <p id="budget"></p>
+        <h3>Genre</h3>
+        <ul id="genres"></ul>
+      </div>
+    </div>
+
+    <div id="container">
+      <h1 id="title"></h1>
+      <p id="vote_average"></p>
+      <p id="vote_count"></p>
+      <p id="budget"></p>
+      <ul id="genres"></ul>
+      <button id="addToFavorites" class="btn btn-primary" style="display: none">
+>>>>>>> 80854d7d234bdd8ce2cf34857301b3082def9611
         Add to Favorites
       </button>
     </div>
@@ -173,6 +193,7 @@
 
           const poster = document.getElementById("poster");
           poster.src = data.poster;
+          poster.style.display = "inline";
 
           const overview = document.getElementById("overview");
           overview.innerHTML = data.overview;
@@ -193,6 +214,9 @@
             li.innerHTML = genre.name;
             genres.appendChild(li);
           });
+          const movieDetails = document.querySelector(".col-lg-6");
+          movieDetails.style.display = "block";
+          document.getElementById("addToFavorites").style.display = "block";
         } catch (error) {
           console.log(error);
           alert("Failed to fetch movie.");

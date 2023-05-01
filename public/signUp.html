@@ -258,7 +258,7 @@
             alert("Failed to log in.");
           }
         });
-      //Google Login
+      // Google Login
       async function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -300,6 +300,8 @@
 
             localStorage.setItem("token", token);
             alert("User logged in successfully with Google!");
+
+            // Update UI to reflect successful login
             document.getElementById("logoutNavItem").style.display = "block";
             document.getElementById("signupNavItem").style.display = "none";
             window.location.href = "/index.html";

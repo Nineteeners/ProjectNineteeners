@@ -18,7 +18,7 @@ const apiEndpoint = "https://api.themoviedb.org/3/movie/{movieId}";
 const apiKey = process.env.API_KEY;
 const dbUser = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
-const serviceAccount = process.env.FIREBASE_CRED;
+const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
 const language = "en-US";
 
 //Connect to db

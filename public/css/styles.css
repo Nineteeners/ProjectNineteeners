@@ -113,4 +113,6 @@ body {
         height: 300px;
       }
 
-  
+  #userEmail{
+    margin: auto;
+  }

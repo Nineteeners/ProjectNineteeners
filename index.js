@@ -253,7 +253,7 @@ app.get("/search/:query/:page", authMiddleware, async (req, res) => {
   }
 });
 
-//API endpoint to fet popular movies
+//API endpoint to fetch popular movies
 
 // Modify the popular movies endpoint
 app.get("/popular", async (req, res) => {

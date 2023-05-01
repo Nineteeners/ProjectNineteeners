@@ -269,21 +269,20 @@
           const token = await userCredential.user.getIdToken();
           const email = userCredential.user.email;
 
-          // Check if the Google email is already in use
-          const checkResponse = await fetch(
-            "https://chromatic-cinema.herokuapp.com/check-email",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email }),
-            }
-          );
+          const isNewUser = userCredential.additionalUserInfo.isNewUser;
 
-          if (checkResponse.ok) {
-            const isNewUser = userCredential.additionalUserInfo.isNewUser;
+          // If it's the user's first time logging in, sign them up
+          if (isNewUser) {
+            const checkResponse = await fetch(
+              "https://chromatic-cinema.herokuapp.com/check-email",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+              }
+            );
 
-            // If it's the user's first time logging in, sign them up
-            if (isNewUser) {
+            if (checkResponse.ok) {
               const signupResponse = await fetch(
                 "https://chromatic-cinema.herokuapp.com/signup",
                 {
@@ -297,17 +296,15 @@
                 throw new Error(await signupResponse.text());
               }
             }
-
-            localStorage.setItem("token", token);
-            alert("User logged in successfully with Google!");
-
-            // Update UI to reflect successful login
-            document.getElementById("logoutNavItem").style.display = "block";
-            document.getElementById("signupNavItem").style.display = "none";
-            window.location.href = "/index.html";
-          } else {
-            throw new Error("Email is already in use.");
           }
+
+          localStorage.setItem("token", token);
+          alert("User logged in successfully with Google!");
+
+          // Update UI to reflect successful login
+          document.getElementById("logoutNavItem").style.display = "block";
+          document.getElementById("signupNavItem").style.display = "none";
+          window.location.href = "/index.html";
         } catch (error) {
           console.error(error);
           alert(`Failed to log in with Google. ${error.message}`);

@@ -18,6 +18,7 @@ const apiEndpoint = "https://api.themoviedb.org/3/movie/{movieId}";
 const apiKey = process.env.API_KEY;
 const dbUser = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
+const serviceAccount = process.env.FIREBASE_CRED;
 const language = "en-US";
 
 //Connect to db
@@ -37,7 +38,6 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 //Initilize Firebase Admin
-const serviceAccount = require("./chromatic-cinema-firebase-adminsdk-i6t8s-49bf2f33ad.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });

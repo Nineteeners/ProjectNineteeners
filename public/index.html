@@ -116,6 +116,10 @@
         <div id="owl-carousel" class="owl-carousel owl-theme"></div>
       </div>
     </div>
+    <div class="container">
+      <h1 id = "popular"> Popular Movies</h2>
+      <div id="popularMovies" class="movie-cards-container"></div>
+    </div>
     <script>
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
@@ -154,6 +158,7 @@
             document.getElementById("logoutNavItem").style.display = "none";
             document.getElementById("signupNavItem").style.display = "block";
           }
+          fetchPopular();
         });
       }
 
@@ -162,6 +167,7 @@
           // Set the theme on page load
           getTheme();
           fetchTopRatedMovies();
+          fetchPopular();
         })
         .catch((error) => {
           console.error("Failed to initialize Firebase:", error);
@@ -223,6 +229,53 @@
         }
         activeItem.classList.remove("active");
       });
+      async function fetchPopular() {
+        try {
+          const response = await axios.get("http://localhost:3001/popular");
+
+          const popular = response.data;
+          //console.log("Popular content:", popular);
+
+          const popularMovies = Object.values(popular);
+          console.log("Popular Movies:", popularMovies);
+
+          // Display favorite movies
+          const popularMoviesContainer =
+            document.getElementById("popularMovies");
+          popularMoviesContainer.innerHTML = "";
+          popularMovies.forEach((movie) => {
+            const movieCard = createMovieCard(movie);
+            popularMoviesContainer.appendChild(movieCard);
+          });
+        } catch (error) {
+          console.error("Error fetching popular movies:", error);
+        }
+      }
+      function createMovieCard(movie) {
+        const movieCard = document.createElement("div");
+        movieCard.classList.add("movie-card");
+
+        const moviePoster = document.createElement("img");
+        moviePoster.classList.add("movie-poster");
+        moviePoster.src = movie.poster;
+        moviePoster.onerror = function () {
+          movieCard.remove();
+        };
+        movieCard.appendChild(moviePoster);
+
+        const movieTitle = document.createElement("div");
+        movieTitle.classList.add("movie-title");
+        movieTitle.textContent = movie.title;
+        movieCard.appendChild(movieTitle);
+
+        // Add click event listener to redirect to movie page
+        movieCard.addEventListener("click", () => {
+          window.location.href = `http://localhost:3001/movie.html?id=${movie.id}`;
+        });
+
+        return movieCard;
+      }
+
       function setTheme(color) {
         axios
           .post("/theme", { color: color })
@@ -239,13 +292,14 @@
               "bg-purple"
             );
             body.classList.add(`bg-${color}`);
-
+            
             // Destroy the existing Owl Carousel
             const owlCarousel = $("#owl-carousel");
             owlCarousel.trigger("destroy.owl.carousel");
 
             // Fetch top-rated movies and reinitialize Owl Carousel
             fetchTopRatedMovies();
+            fetchPopular();
           })
           .catch((error) => {
             console.error(error);

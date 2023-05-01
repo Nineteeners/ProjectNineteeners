@@ -1,34 +1,30 @@
-<!-- HomePage HTML -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-       <!-- Include Bootstrap's JavaScript library -->
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
     <link
-    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  
-  <link rel="stylesheet" href="css/styles.css" />
-  
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <!-- Include jQuery from a CDN -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
-  <!-- Include Bootstrap's JavaScript library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
-
-  <!-- Add Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <title>Home</title>
   </head>
@@ -99,21 +95,9 @@
       </div>
     </nav>
     <div id="title">
-      <h1>    Top Rated Movies</h1>
+      <h1>Top Rated Movies</h1>
     </div>
-    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators"></ol>
-      <div class="carousel-inner"></div>
-      <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-    
+    <div id="owl-carousel" class="owl-carousel owl-theme"></div>
     <script>
         async function initializeFirebase() {
           const response = await fetch("/firebaseConfig");
@@ -145,6 +129,7 @@
         .then(() => {
           // Set the theme on page load
           getTheme();
+          fetchTopRatedMovies();
         })
         .catch((error) => {
           console.error("Failed to initialize Firebase:", error);
@@ -156,37 +141,22 @@
         // Make a GET request using Axios
         axios.get('http://localhost:3001/top_rated')
           .then(response => {
-            // Loop through the response data and create carousel slides
-            response.data.forEach((image, index) => {
-              // Create the carousel indicator
-              const indicator = document.createElement('li');
-              indicator.setAttribute('data-target', '#carouselExampleIndicators');
-              indicator.setAttribute('data-slide-to', index);
-              if (index === 0) {
-                indicator.classList.add('active');
-              }
-              carousel.querySelector('.carousel-indicators').appendChild(indicator);
-      
-              // Create the carousel slide
-              const slide = document.createElement('div');
-              slide.classList.add('carousel-item');
-              if (index === 0) {
-                slide.classList.add('active');
-              }
-              const img = document.createElement('img');
-              img.classList.add('d-block', 'w-100');
-              img.setAttribute('src', image.poster);
-              img.setAttribute('alt', image.alt);
-              slide.appendChild(img);
-              carousel.querySelector('.carousel-inner').appendChild(slide);
-
-              slide.addEventListener("click", () => {
-          window.location.href = `http://localhost:3001/movie.html?id=${image.id}`;
-        });
-
+            const owlCarousel = $("#owl-carousel");
+            owlCarousel.html("");
+            response.data.forEach((image) => {
+              const slide = $(`<div class="item"><img src="${image.poster}" alt="${image.alt}" /></div>`);
+              slide.on("click", () => {
+                window.location.href = `http://localhost:3001/movie.html?id=${image.id}`;
+              });
+              owlCarousel.append(slide);
             });
-           // window.location.reload();
 
+            owlCarousel.owlCarousel({
+              loop: true,
+              margin: 10,
+              nav: true,
+              items: 1,
+            });
           });
       }
     
@@ -231,7 +201,6 @@
             );
             body.classList.add(`bg-${color}`);
             fetchTopRatedMovies();
-            window.location.reload();
 
           })
           .catch((error) => {
@@ -253,7 +222,6 @@
             "bg-purple"
           );
           body.classList.add(`bg-${color}`);
-          fetchTopRatedMovies();
 
         } catch (error) {
           console.error(error);

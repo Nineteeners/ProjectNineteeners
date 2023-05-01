@@ -381,7 +381,6 @@ app.get("/favorites", authMiddleware, async (req, res) => {
   }
 });
 
-
 //Check if movie in favorites
 app.get("/favorites/check/:movieId", authMiddleware, async (req, res) => {
   const uid = req.user.uid;
@@ -445,6 +444,7 @@ app.delete("/favorites/:movieId", authMiddleware, async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port http://localhost:3001");
+const port = process.env.PORT || 3001;
+app.listen(port, () => {
+  console.log(`Server listening on port http://localhost:${port}`);
 });

@@ -259,6 +259,7 @@
           }
         });
 
+      //Google Login
       async function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -291,7 +292,7 @@
           window.location.href = "/index.html";
         } catch (error) {
           console.error(error);
-          alert(`Failed to log in with Google. ${error.message}`);
+          //alert(`Failed to log in with Google. ${error.message}`);
         }
       }
       document

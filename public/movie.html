@@ -105,7 +105,11 @@
       <p id="vote_count"></p>
       <p id="budget"></p>
       <ul id="genres"></ul>
-      <button id="addToFavorites" class="btn btn-primary" style="display: none">
+      <button
+        id="favoritesButton"
+        class="btn btn-primary"
+        style="display: none"
+      >
         Add to Favorites
       </button>
     </div>
@@ -204,7 +208,37 @@
           document.getElementById("addToFavorites").style.display = "block";
         } catch (error) {
           console.log(error);
-          alert("Failed to fetch movie.");
+          //alert("Failed to fetch movie.");
+        }
+        checkIfMovieInFavorites(movieId);
+      }
+
+      async function checkIfMovieInFavorites(movieId) {
+        try {
+          const auth = firebase.auth();
+          const idToken = await auth.currentUser.getIdToken(true);
+
+          const response = await axios.get(`/favorites/check/${movieId}`, {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+
+          const favoritesButton = document.getElementById("favoritesButton");
+
+          if (response.data.isFavorite) {
+            favoritesButton.innerHTML = "Remove from Favorites";
+            favoritesButton.classList.remove("btn-primary");
+            favoritesButton.classList.add("btn-danger");
+          } else {
+            favoritesButton.innerHTML = "Add to Favorites";
+            favoritesButton.classList.remove("btn-danger");
+            favoritesButton.classList.add("btn-primary");
+          }
+
+          favoritesButton.style.display = "block";
+        } catch (error) {
+          console.error(
+            `Error while checking favorite movie: ${error.message}`
+          );
         }
       }
 
@@ -283,30 +317,35 @@
           }
         });
 
-      //Feth request to Favorites
+      // Add or remove movie from favorites
       document
-        .getElementById("addToFavorites")
+        .getElementById("favoritesButton")
         .addEventListener("click", async () => {
           try {
             const auth = firebase.auth();
-            const idToken = await auth.currentUser.getIdToken(
-              /* forceRefresh */ true
-            );
+            const idToken = await auth.currentUser.getIdToken(true);
+            const favoritesButton = document.getElementById("favoritesButton");
 
-            const response = await axios.post(`/favorites/${movieId}`, null, {
-              headers: { Authorization: `Bearer ${idToken}` },
-            });
+            if (favoritesButton.innerHTML === "Add to Favorites") {
+              const response = await axios.post(`/favorites/${movieId}`, null, {
+                headers: { Authorization: `Bearer ${idToken}` },
+              });
 
-            if (response.status === 200) {
-              alert("Movie added to favorites");
-            } else {
-              alert("Failed to add movie to favorites");
+              if (response.status === 200) {
+                alert("Movie added to favorites");
+                checkIfMovieInFavorites(movieId);
+              }
+            } else if (favoritesButton.innerHTML === "Remove from Favorites") {
+              const response = await axios.delete(`/favorites/${movieId}`, {
+                headers: { Authorization: `Bearer ${idToken}` },
+              });
+              if (response.status === 200) {
+                alert("Movie removed from favorites");
+                checkIfMovieInFavorites(movieId);
+              }
             }
           } catch (error) {
-            console.error(
-              `Error while adding favorite movie: ${error.message}`
-            );
-            alert("Failed to add movie to favorites");
+            console.error(`Error while updating favorites: ${error.message}`);
           }
         });
     </script>

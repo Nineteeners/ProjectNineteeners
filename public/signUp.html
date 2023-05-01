@@ -120,6 +120,7 @@
                   type="email"
                   id="signupEmail"
                   class="form-control form-control-lg"
+                  onkeydown="onInputKeyDown(event)"
                 />
                 <label class="form-label" for="typeEmailX-2">Email</label>
               </div>
@@ -129,6 +130,7 @@
                   type="password"
                   id="signupPassword"
                   class="form-control form-control-lg"
+                  onkeydown="onInputKeyDown(event)"
                 />
                 <label class="form-label" for="typePasswordX-2">Password</label>
               </div>
@@ -344,6 +346,13 @@
             return "0, 0, 0";
         }
       }
+      function onInputKeyDown(event) {
+        if (event.keyCode === 13) {
+          event.preventDefault(); // Prevent form submission
+          document.getElementById("loginButton").click(); // Trigger click event on Login button
+        }
+      }
+
       setTimeout(function () {
         if (window.location.search.includes("logged_out=true")) {
           alert("Need to be logged in to use this feature!");

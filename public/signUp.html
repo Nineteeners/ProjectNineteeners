@@ -258,7 +258,7 @@
             alert("Failed to log in.");
           }
         });
-      // Google Login
+
       async function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -269,33 +269,17 @@
           const token = await userCredential.user.getIdToken();
           const email = userCredential.user.email;
 
-          const isNewUser = userCredential.additionalUserInfo.isNewUser;
-
-          // If it's the user's first time logging in, sign them up
-          if (isNewUser) {
-            const checkResponse = await fetch(
-              "https://chromatic-cinema.herokuapp.com/check-email",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-              }
-            );
-            password = "Ab7AcD57asDu7qQ";
-            if (checkResponse.ok) {
-              const signupResponse = await fetch(
-                "https://chromatic-cinema.herokuapp.com/signup",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email, password }),
-                }
-              );
-
-              if (!signupResponse.ok) {
-                throw new Error(await signupResponse.text());
-              }
+          const response = await fetch(
+            "https://chromatic-cinema.herokuapp.com/signup-with-google",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, token }),
             }
+          );
+
+          if (!response.ok) {
+            throw new Error(await response.text());
           }
 
           localStorage.setItem("token", token);
@@ -304,7 +288,7 @@
           // Update UI to reflect successful login
           document.getElementById("logoutNavItem").style.display = "block";
           document.getElementById("signupNavItem").style.display = "none";
-          //window.location.href = "/index.html";
+          window.location.href = "/index.html";
         } catch (error) {
           console.error(error);
           alert(`Failed to log in with Google. ${error.message}`);

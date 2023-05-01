@@ -344,6 +344,35 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// Signup with Google endpoint
+app.post("/signup-with-google", async (req, res) => {
+  const { email, token } = req.body;
+
+  try {
+    const decodedToken = await auth.verifyIdToken(token);
+    if (decodedToken.email !== email) {
+      throw new Error("Token email does not match request email");
+    }
+
+    const userRecord = await auth.getUser(decodedToken.uid);
+    if (!userRecord.emailVerified) {
+      throw new Error("User email is not verified");
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.status(409).json({ error: "User already exists" });
+      return;
+    }
+
+    await saveUserToDatabase(decodedToken.uid, email);
+    res.status(201).json({ uid: decodedToken.uid });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
 //List favorites
 app.get("/favorites", authMiddleware, async (req, res) => {
   const uid = req.user.uid;

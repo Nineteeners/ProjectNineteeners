@@ -33,8 +33,9 @@
     <title>Home</title>
   </head>
   <body>
+    Home Page
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Chromatic Cinema</a>
+      <a class="navbar-brand" href="#">Movie Search App</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -203,7 +204,7 @@
       });
 
       const prevButton = document.querySelector('.carousel-control-prev');
-      prevButton.addEventListener('click', () => {
+      prevButhy5tton.addEventListener('click', () => {
         const activeItem = document.querySelector('.carousel-item.active');
         if (activeItem.previousElementSibling) {
           activeItem.previousElementSibling.classList.add('active');
@@ -274,21 +275,7 @@
           default:
             return "0, 0, 0";
         }
-      }
 
-        // Log out
-        document
-        .getElementById("logoutButton")
-        .addEventListener("click", async () => {
-          try {
-            await firebase.auth().signOut();
-            localStorage.removeItem("token");
-            alert("User logged out successfully!");
-            window.location.href = "/index.html";
-          } catch (error) {
-            console.error(error);
-            alert("Failed to log out.");
-          }
-        });
+      }
     </script>
 </html>

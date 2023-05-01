@@ -201,34 +201,6 @@
         });
       }
 
-      // Add event listeners to the carousel controls
-      const nextButton = document.querySelector(".carousel-control-next");
-      nextButton.addEventListener("click", () => {
-        const activeItem = document.querySelector(".carousel-item.active");
-        if (activeItem.nextElementSibling) {
-          activeItem.nextElementSibling.classList.add("active");
-        } else {
-          // If there are no more elements, loop back to the first one
-          carousel
-            .querySelector(".carousel-item:first-child")
-            .classList.add("active");
-        }
-        activeItem.classList.remove("active");
-      });
-
-      const prevButton = document.querySelector(".carousel-control-prev");
-      prevButton.addEventListener("click", () => {
-        const activeItem = document.querySelector(".carousel-item.active");
-        if (activeItem.previousElementSibling) {
-          activeItem.previousElementSibling.classList.add("active");
-        } else {
-          // If there are no previous elements, go to the last one
-          carousel
-            .querySelector(".carousel-item:last-child")
-            .classList.add("active");
-        }
-        activeItem.classList.remove("active");
-      });
       async function fetchPopular() {
         try {
           const response = await axios.get("https://chromatic-cinema.herokuapp.com/popular");

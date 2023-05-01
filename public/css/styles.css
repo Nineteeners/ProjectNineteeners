@@ -146,7 +146,7 @@ body {
   .right-side-content {
     width: 50%; /* Change from 60% to 50% */
     margin-left: 25%; /* Add this line to move the right-side-content to the right */
-    margin-top: 100px;
+    margin-top: 25px;
   }
   
   #title {

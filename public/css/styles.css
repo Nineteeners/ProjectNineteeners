@@ -109,4 +109,8 @@ body {
     float: left; /* move the entire textbox to the right */
     left:80px
       }
+      .owl-carousel {
+        height: 300px;
+      }
+
   

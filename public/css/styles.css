@@ -118,4 +118,6 @@ body {
     z-index: 100;
   }
 
-  
+  #userEmail{
+    margin: auto;
+  }

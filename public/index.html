@@ -94,10 +94,28 @@
         </ul>
       </div>
     </nav>
-    <div id="title">
-      <h1>Top Rated Movies</h1>
+    <div class="content-wrapper">
+      <div class="left-side-content">
+        <h2>About Chromatic Cinema</h2>
+        <p>
+          Chromatic Cinema is a platform where movie enthusiasts can explore the
+          world through a different lens. We bring you a curated collection of
+          top-rated movies from various genres, themes, and time periods.
+        </p>
+        <p>
+          Discover hidden gems, revisit classics, or find your next favorite
+          film – Chromatic Cinema is your one-stop destination for a unique
+          cinematic experience.
+        </p>
+      </div>
+
+      <div class="right-side-content">
+        <div id="title">
+          <h1>Top Rated Movies</h1>
+        </div>
+        <div id="owl-carousel" class="owl-carousel owl-theme"></div>
+      </div>
     </div>
-    <div id="owl-carousel" class="owl-carousel owl-theme"></div>
     <script>
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
@@ -171,6 +189,8 @@
             margin: 10,
             nav: true,
             items: 1,
+            autoplay: true,
+            autoplayTimeout: 2500,
           });
         });
       }

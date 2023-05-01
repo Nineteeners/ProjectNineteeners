@@ -127,3 +127,45 @@ body {
     width: auto;
     margin-right: 10px;
   }
+
+  .content-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start; /* Add this line to align the items to the top */
+    justify-content: space-between; /* Add this line to space the items apart */
+  }
+  
+  .left-side-content {
+    width: 40%;
+    padding: 100px;
+    font-size: 1.1em;
+    line-height: 1.6em;
+    margin-top: 125px; /* Add this line to push the left-side-content down */
+  }
+  
+  .right-side-content {
+    width: 50%; /* Change from 60% to 50% */
+    margin-left: 25%; /* Add this line to move the right-side-content to the right */
+    margin-top: 100px;
+  }
+  
+  #title {
+    margin-top: 20px; /* Add this line to push the title down */
+  }
+  
+  .left-side-content,
+  .right-side-content {
+    vertical-align: top;
+  }
+  
+
+.left-side-content h2 {
+  font-size: 1.8em;
+  margin-bottom: 15px;
+}
+
+.left-side-content p {
+  margin-bottom: 15px;
+}
+
+

@@ -265,14 +265,48 @@
             .auth()
             .signInWithPopup(provider);
           const token = await userCredential.user.getIdToken();
-          localStorage.setItem("token", token);
-          alert("User logged in successfully with Google!");
-          document.getElementById("logoutNavItem").style.display = "block";
-          document.getElementById("signupNavItem").style.display = "none";
-          window.location.href = "/index.html";
+          const email = userCredential.user.email;
+
+          // Check if the Google email is already in use
+          const checkResponse = await fetch(
+            "https://chromatic-cinema.herokuapp.com/check-email",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            }
+          );
+
+          if (checkResponse.ok) {
+            const isNewUser = userCredential.additionalUserInfo.isNewUser;
+
+            // If it's the user's first time logging in, sign them up
+            if (isNewUser) {
+              const signupResponse = await fetch(
+                "https://chromatic-cinema.herokuapp.com/signup",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email }),
+                }
+              );
+
+              if (!signupResponse.ok) {
+                throw new Error(await signupResponse.text());
+              }
+            }
+
+            localStorage.setItem("token", token);
+            alert("User logged in successfully with Google!");
+            document.getElementById("logoutNavItem").style.display = "block";
+            document.getElementById("signupNavItem").style.display = "none";
+            window.location.href = "/index.html";
+          } else {
+            throw new Error("Email is already in use.");
+          }
         } catch (error) {
           console.error(error);
-          alert("Failed to log in with Google.");
+          alert(`Failed to log in with Google. ${error.message}`);
         }
       }
       document

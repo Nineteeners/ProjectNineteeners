@@ -444,6 +444,23 @@ app.delete("/favorites/:movieId", authMiddleware, async (req, res) => {
   }
 });
 
+// Check email endpoint
+app.get("/check-email/:email", async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  } catch (error) {
+    console.error(`Error while checking email: ${error.message}`);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on port http://localhost:${port}`);

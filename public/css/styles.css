@@ -99,6 +99,9 @@ body {
     
   }
   #overview{
-    border-style: dashed;
-    }
+    border-style: solid;
+    text-align: left; /* align text inside the textbox to the right */
+    float: left; /* move the entire textbox to the right */
+    left:80px
+      }
   

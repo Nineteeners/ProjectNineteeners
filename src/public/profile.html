@@ -98,6 +98,15 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
+      /**
+       * Initializes Firebase by fetching the Firebase configuration from "/firebaseConfig"
+       * and initializing Firebase using the configuration. Calls updateUI to update the UI
+       * after Firebase has been initialized.
+       *
+       * @returns {Promise<void>} A promise that resolves when Firebase has been initialized
+       * and updateUI has been called.
+       * @throws {Error} If Firebase fails to initialize.
+       */
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
@@ -108,6 +117,9 @@
         updateUI();
       }
 
+      /**
+       * Updates the UI based on the user's authentication status.
+       */
       function updateUI() {
         firebase.auth().onAuthStateChanged(function (user) {
           if (user) {
@@ -126,20 +138,29 @@
         });
       }
 
+      // Initialize Firebase and set the theme on page load.
       initializeFirebase()
         .then(() => {
-          // Set the theme on page load
           getTheme();
         })
         .catch((error) => {
           console.error("Failed to initialize Firebase:", error);
         });
 
+      /**
+       * Fetches the current user's profile and favorite movies from the server using Firebase authentication
+       * and displays the user's email and favorite movies in the UI.
+       *
+       * @returns {Promise<void>} A promise that resolves when the user's profile and favorite movies have
+       * been fetched and displayed in the UI.
+       * @throws {Error} If there is an error fetching the user's profile or favorite movies.
+       */
       async function getUserProfile() {
         try {
           const user = firebase.auth().currentUser;
           const token = await user.getIdToken();
 
+          // Fetch user profile
           const response = await axios.get("/profile", {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -176,6 +197,14 @@
         }
       }
 
+      /**
+       * Creates a DOM element that displays a movie poster and title and redirects the user
+       * to the movie's details page when clicked.
+       *
+       * @param {Object} movie - An object representing a movie, with properties "id", "title", and "poster".
+       * @returns {HTMLElement} A DOM element that displays the movie poster and title and can be clicked
+       * to redirect the user to the movie's details page.
+       */
       function createMovieCard(movie) {
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
@@ -201,6 +230,13 @@
         return movieCard;
       }
 
+      /**
+       * Sets the theme color of the application by sending a POST request to the server.
+       *
+       * @param {string} color - The new theme color, as a string representing a CSS class name ("red", "green", "blue", "yellow", or "purple").
+       * @returns {void}
+       * @throws {Error} If there is an error setting the theme color.
+       */
       function setTheme(color) {
         axios
           .post("/theme", { color: color })
@@ -223,6 +259,13 @@
             console.error(error);
           });
       }
+
+      /**
+       * Fetches the current theme color from the server and updates the background color of the page.
+       *
+       * @returns {Promise<void>} A promise that resolves when the theme color has been fetched and the background color has been updated.
+       * @throws {Error} If there is an error fetching the theme color.
+       */
       async function getTheme() {
         try {
           const response = await axios.get("/theme");
@@ -243,6 +286,12 @@
         }
       }
 
+      /**
+       * Returns the RGB color code for a given color string.
+       *
+       * @param {string} color - A string representing a color ("red", "green", "blue", "yellow", or "purple").
+       * @returns {string} The RGB color code for the given color, as a string.
+       */
       function getColorCode(color) {
         switch (color) {
           case "red":
@@ -261,6 +310,13 @@
       }
 
       // Log out
+      /**
+       * Event listener that logs out the current user and redirects them to the index page.
+       *
+       * @listens click
+       * @returns {void}
+       * @throws {Error} If there is an error logging out the user.
+       */
       document
         .getElementById("logoutButton")
         .addEventListener("click", async () => {

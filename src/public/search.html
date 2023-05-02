@@ -22,7 +22,7 @@
     <!-- Navbar HTML -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
       <a href="index.html">
-        <img src="CC_logo.jpg" alt="Logo" class="navbar-logo">
+        <img src="CC_logo.jpg" alt="Logo" class="navbar-logo" />
       </a>
       <a class="navbar-brand" href="/">Chromatic Cinema </a>
       <button
@@ -110,6 +110,15 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <script>
+      /**
+       * Initializes Firebase with configuration from "/firebaseConfig" endpoint.
+       * If Firebase has not been initialized, it will be initialized.
+       * Calls updateUI function after initialization.
+       *
+       * @async
+       * @function
+       * @returns {Promise<void>}
+       */
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
@@ -120,6 +129,16 @@
         updateUI();
       }
 
+      /**
+       * Updates the UI based on the user's authentication state.
+       * If the user is authenticated, displays the search, profile, and logout navigation items
+       * and hides the sign up navigation item. If the user is not authenticated, hides the search,
+       * profile, and logout navigation items and displays the sign up navigation item. Redirects
+       * to the sign up page with a logged_out query parameter if the user is not authenticated.
+       *
+       * @function
+       * @returns {void}
+       */
       function updateUI() {
         firebase.auth().onAuthStateChanged(function (user) {
           if (user) {
@@ -137,6 +156,7 @@
         });
       }
 
+      // Call initializeFirebase and set theme on page load
       initializeFirebase()
         .then(() => {
           // Set the theme on page load
@@ -145,7 +165,15 @@
         .catch((error) => {
           console.error("Failed to initialize Firebase:", error);
         });
-      // Add event listeners for the previous and next buttons
+
+      /**
+       * Add event listeners for the previous and next buttons.
+       * @param {Object} previousButton - The button element for going to the previous page of search results.
+       * @param {Object} nextButton - The button element for going to the next page of search results.
+       * @param {Object} searchButton - The button element for initiating a search.
+       * @param {Object} searchInput - The input element for entering a search query.
+       * @param {number} currentPage - The current page of search results being displayed.
+       */
       const previousButton = document.getElementById("previous-button");
       const nextButton = document.getElementById("next-button");
       const searchButton = document.getElementById("search-button");
@@ -166,6 +194,11 @@
         nextButton.classList.toggle("disabled", currentPage >= totalPages);
       });
 
+      /**
+       * Creates a movie card HTML element.
+       * @param {Object} movie - The movie object to create a card for.
+       * @return {Object} The movie card HTML element.
+       */
       function createMovieCard(movie) {
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
@@ -191,7 +224,13 @@
         return movieCard;
       }
 
-      // Update the searchMovies function to take a page parameter
+      /**
+       * Updates the movies displayed on the page based on a search query and page number.
+       * @async
+       * @function searchMovies
+       * @param {string} query - The search query.
+       * @param {number} [page=1] - The page number of search results to display (default is 1).
+       */
       async function searchMovies(query, page = 1) {
         try {
           const token = localStorage.getItem("token"); // Get the token from local storage
@@ -209,6 +248,10 @@
           previousButton.classList.toggle("disabled", page <= 1);
           nextButton.classList.toggle("disabled", page >= totalPages);
 
+          /**
+           * The container element for displaying movie cards.
+           * @type {Object}
+           */
           const moviesContainer = document.querySelector(".movies-container");
           moviesContainer.innerHTML = "";
           if (movies.length === 0) {
@@ -216,6 +259,10 @@
             moviesContainer.innerHTML = "<p>No results found.</p>";
           } else {
             movies.forEach((movie, index) => {
+              /**
+               * The HTML element for displaying a single movie card.
+               * @type {Object}
+               */
               const movieCard = createMovieCard(movie);
               if (movieCard) {
                 moviesContainer.appendChild(movieCard);
@@ -230,6 +277,11 @@
         }
       }
 
+      /**
+       * Sets the theme color of the page and updates the movies displayed.
+       * @function setTheme
+       * @param {string} color - The theme color to set (must be one of "red", "green", "blue", "yellow", or "purple").
+       */
       function setTheme(color) {
         axios
           .post("/theme", { color: color })
@@ -252,6 +304,12 @@
             console.error(error);
           });
       }
+
+      /**
+       * Retrieves the current theme color from the server and updates the page accordingly.
+       * @async
+       * @function getTheme
+       */
       async function getTheme() {
         try {
           const response = await axios.get("/theme");
@@ -273,6 +331,12 @@
         }
       }
 
+      /**
+       * Retrieves the RGB color code for a given color name.
+       * @function getColorCode
+       * @param {string} color - The color name (must be one of "red", "green", "blue", "yellow", or "purple").
+       * @return {string} The RGB color code in the format "r, g, b".
+       */
       function getColorCode(color) {
         switch (color) {
           case "red":
@@ -291,6 +355,10 @@
       }
 
       // Update the event listener for the search button
+      /**
+       * The container element for displaying movie cards.
+       * @type {Object}
+       */
       const moviesContainer = document.querySelector(".movies-container");
       searchButton.addEventListener("click", () => {
         const query = searchInput.value.trim();

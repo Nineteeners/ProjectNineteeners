@@ -1,0 +1,16 @@
+{
+    "source": {
+      "include": ["./src"],
+      "exclude": ["./node_modules"],
+      "includePattern": ".js$"
+    },
+    "opts": {
+      "destination": "./docs"
+    },
+    "plugins": [],
+    "templates": {
+      "cleverLinks": false,
+      "monospaceLinks": false
+    }
+  }
+  

@@ -23,8 +23,8 @@
     <!-- Navbar HTML -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
       <a href="index.html">
-        <img src="CC_logo.jpg" alt="Logo" class="navbar-logo">
-      </a>      
+        <img src="CC_logo.jpg" alt="Logo" class="navbar-logo" />
+      </a>
       <a class="navbar-brand" href="/">Chromatic Cinema </a>
       <button
         class="navbar-toggler"
@@ -131,6 +131,10 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
+      /**
+       * Initializes the Firebase app and updates the UI based on the user's authentication state.
+       * @async
+       */
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
@@ -141,6 +145,9 @@
         updateUI();
       }
 
+      /**
+       * Updates the website UI based on the user's authentication state.
+       */
       function updateUI() {
         firebase.auth().onAuthStateChanged(function (user) {
           if (user) {
@@ -167,12 +174,17 @@
         .catch((error) => {
           console.error("Failed to initialize Firebase:", error);
         });
+
       // Get movie ID from URL query string
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const movieId = urlParams.get("id");
 
-      // Fetch movie data from API
+      /**
+       * Fetches movie data from the API and updates the HTML elements with the movie details.
+       * @async
+       * @param {string} movieId - The ID of the movie to fetch.
+       */
       async function getMovie(movieId) {
         const url = `https://chromatic-cinema.herokuapp.com/movie/${movieId}`;
 
@@ -228,6 +240,11 @@
         checkIfMovieInFavorites(movieId);
       }
 
+      /**
+       * Checks if the movie with the given ID is in the user's favorites and updates the favorites button accordingly.
+       * @async
+       * @param {string} movieId - The ID of the movie to check.
+       */
       async function checkIfMovieInFavorites(movieId) {
         try {
           const auth = firebase.auth();
@@ -257,6 +274,10 @@
         }
       }
 
+      /**
+       * Sets the website's theme color and updates the background color accordingly.
+       * @param {string} color - The new theme color.
+       */
       function setTheme(color) {
         axios
           .post("/theme", { color: color })
@@ -280,6 +301,11 @@
             console.error(error);
           });
       }
+
+      /**
+       * Fetches the current theme color from the server and updates the background color of the page accordingly.
+       * @returns {Promise<void>} A Promise that resolves when the theme color has been applied.
+       */
       async function getTheme() {
         try {
           const response = await axios.get("/theme");
@@ -300,6 +326,11 @@
         }
       }
 
+      /**
+       * Returns the RGB color code corresponding to a given theme color.
+       * @param {string} color The theme color (e.g., "red", "green", etc.).
+       * @returns {string} The RGB color code (e.g., "255, 0, 0" for red).
+       */
       function getColorCode(color) {
         switch (color) {
           case "red":

@@ -6,30 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="CC_logo.ico" type="image/x-icon" />
     <title>Firebase Authentication</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-
-      .container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 10px;
-        text-align: center;
-      }
-
-      input {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-      }
-
-      button {
-        padding: 10px;
-        width: 100%;
-        margin: 5px 0;
-      }
-    </style>
     <link
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
@@ -175,6 +151,11 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
+      /**
+       * Initializes Firebase using configuration fetched from "/firebaseConfig" endpoint
+       * and updates the UI based on the authentication state of the user.
+       * @returns {Promise<void>}
+       */
       async function initializeFirebase() {
         const response = await fetch("/firebaseConfig");
         const firebaseConfig = await response.json();
@@ -182,9 +163,13 @@
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
         }
+
         updateUI();
       }
 
+      /**
+       * Updates the UI based on the authentication state of the user.
+       */
       function updateUI() {
         firebase.auth().onAuthStateChanged(function (user) {
           if (user) {
@@ -210,7 +195,10 @@
           console.error("Failed to initialize Firebase:", error);
         });
 
-      // Sign up
+      /**
+       * Adds event listener for sign up button and sends a POST request to sign up the user.
+       * @returns {Promise<void>}
+       */
       document
         .getElementById("signupButton")
         .addEventListener("click", async () => {
@@ -237,7 +225,10 @@
           }
         });
 
-      // Log in
+      /**
+       * Adds event listener for login button and attempts to sign in the user using Firebase authentication.
+       * @returns {Promise<void>}
+       */
       document
         .getElementById("loginButton")
         .addEventListener("click", async () => {
@@ -259,7 +250,10 @@
           }
         });
 
-      //Google Login
+      /**
+       * Signs in the user using Google authentication.
+       * @returns {Promise<void>}
+       */
       async function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -296,11 +290,18 @@
           //alert(`Failed to log in with Google. ${error.message}`);
         }
       }
+
+      /**
+       * Adds event listener for Google sign in button.
+       */
       document
         .getElementById("googleSignInButton")
         .addEventListener("click", signInWithGoogle);
 
-      // Log out
+      /**
+       * Adds event listener for log out button and logs the user out.
+       * @returns {Promise<void>}
+       */
       document
         .getElementById("logoutButton")
         .addEventListener("click", async () => {
@@ -315,6 +316,11 @@
           }
         });
 
+      /**
+       * Sets the theme color and updates the background color of the page.
+       * @param {string} color - The color to set the theme to.
+       * @returns {void}
+       */
       function setTheme(color) {
         axios
           .post("/theme", { color: color })
@@ -336,6 +342,11 @@
             console.error(error);
           });
       }
+
+      /**
+       * Retrieves the current theme color and updates the background color of the page.
+       * @returns {Promise<void>}
+       */
       async function getTheme() {
         try {
           const response = await axios.get("/theme");
@@ -356,6 +367,11 @@
         }
       }
 
+      /**
+       * Returns the RGB color code for the given color name.
+       * @param {string} color - The name of the color.
+       * @returns {string} - The RGB color code.
+       */
       function getColorCode(color) {
         switch (color) {
           case "red":
@@ -372,6 +388,13 @@
             return "0, 0, 0";
         }
       }
+
+      /**
+       * Event listener for input key down event.
+       * If Enter key is pressed, prevents form submission and triggers click event on Login button.
+       * @param {KeyboardEvent} event - The KeyboardEvent object.
+       * @returns {void}
+       */
       function onInputKeyDown(event) {
         if (event.keyCode === 13) {
           event.preventDefault(); // Prevent form submission
@@ -379,6 +402,10 @@
         }
       }
 
+      /**
+       * Shows an alert if the page URL contains the query parameter "logged_out=true".
+       * @returns {void}
+       */
       setTimeout(function () {
         if (window.location.search.includes("logged_out=true")) {
           alert("Need to be logged in to use this feature!");
